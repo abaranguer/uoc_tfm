@@ -52,7 +52,7 @@ ML/DL per a la millora de la CNN classificadora.
 No és objectiu prioritari del TFM assolir una determinada precisió del classificador. Tot i
 que, certament, es tractarà d’obtenir els millors resultats.
 
-# setmana 0
+# Setmana 0. Reunió 1 d’octubre de 2021
 pasos a seguir:
 1) lectura de papers 3-4 -- deadline 8 de Octubre (reunion 16:00-17:00)
 ====== decidir en la reunion del dia 8 octubre =========
@@ -67,7 +67,7 @@ pagina para buscar papers: http://www.arxiv-sanity.com/
 twit best practices: https://twitter.com/MattNiessner/status/1441027241870118913
 
 
-# setmana 1.
+# Setmana 1. Reunió 8 d’octubre de 2021
 Implementacion
 * use squeezenet | resnet18 | mobilenet-v3 | efficientnet (light weight backbone)
 * dataset <---
