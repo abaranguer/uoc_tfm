@@ -69,6 +69,6 @@ for imagefile in imagefiles:
         cv2.imwrite(dir_base + folders[i - 1] + '/' + imagefile, image_scaled)
 
     if counter % 100 == 0:
-        print(f'\n\n{counter} files procesed')
+        print(f'\n\n{counter} files processed')
 
 print('\n\nDone!')
