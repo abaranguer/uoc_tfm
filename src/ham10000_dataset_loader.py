@@ -28,7 +28,7 @@ class Ham10000Dataset(Dataset):
         # lesion_id, image_id, dx, dx_type, age, sex, localization, dataset
         self.image_names = self.csv[:]['image_id']
         self.labels = np.array(
-            self.csv.drop(['lesion_id', 'dx', 'dx_type', 'age', 'sex', 'localization', 'dataset'], axis=1))
+            self.csv.drop(['dx', 'dx_type', 'age', 'sex', 'localization', 'dataset'], axis=1))
 
     def __len__(self):
         return len(self.image_names)
@@ -38,7 +38,7 @@ class Ham10000Dataset(Dataset):
         image = Image.open(img_path).convert('RGB')
         image = self.transform(image)
         targets = self.labels[index]
-        return {'image': image, 'label': targets[0]}
+        return {'image': image, 'lesion_id': targets[0],'image_id': targets[1]}
 
 
 def imshow(inp, title=None):
@@ -81,5 +81,9 @@ if __name__ == '__main__':
     images = next(iter(test_dataloader))
 
     output = torchvision.utils.make_grid(images['image'])
+
+    print('Showing images:"')
+    for lesion_id, image_id  in zip(images['lesion_id'], images['image_id']) :
+        print(f"\timage: {image_id}.jpg, lesion_id: {lesion_id}")
 
     imshow(output)
