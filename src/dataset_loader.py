@@ -20,7 +20,7 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
 
-class ImageDataset(Dataset):
+class Ham10000Dataset(Dataset):
     def __init__(self, csv, img_folder, transform):
         self.csv = csv
         self.transform = transform
@@ -28,30 +28,21 @@ class ImageDataset(Dataset):
         # lesion_id, image_id, dx, dx_type, age, sex, localization, dataset
         self.image_names = self.csv[:]['image_id']
         self.labels = np.array(
-            self.csv.drop(['dx', 'dx_type', 'age', 'sex', 'localization', 'dataset'], axis=1))
+            self.csv.drop(['lesion_id', 'dx', 'dx_type', 'age', 'sex', 'localization', 'dataset'], axis=1))
 
     def __len__(self):
         return len(self.image_names)
 
     def __getitem__(self, index):
-        full_sample = self.get(index)
-        image_only = {'image': full_sample['image']}
-
-        return image_only
-
-    def get(self, index):
         img_path = self.img_folder + self.image_names.iloc[index] + '.jpg'
         image = Image.open(img_path).convert('RGB')
         image = self.transform(image)
         targets = self.labels[index]
-
-        sample = {'image': image , 'label': targets}
-
-        return sample
+        return {'image': image, 'label': targets[0]}
 
 
 def imshow(inp, title=None):
-    """imshow for Tensor."""
+    # imshow for Tensor
     inp = inp.numpy().transpose((1, 2, 0))
     inp = np.clip(inp, 0, 1)
     plt.imshow(inp)
@@ -70,8 +61,8 @@ if __name__ == '__main__':
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
 
-    train_dataset = ImageDataset(train_set, image_folder, train_data_transform)
-    test_dataset = ImageDataset(test_set, image_folder, train_data_transform)
+    train_dataset = Ham10000Dataset(train_set, image_folder, train_data_transform)
+    test_dataset = Ham10000Dataset(test_set, image_folder, train_data_transform)
     BATCH_SIZE = 10
     TEST_BATCH_SIZE = 4
 
@@ -87,12 +78,8 @@ if __name__ == '__main__':
         shuffle=True
     )
 
-    print(f'Test batch size: {test_dataloader.batch_size}')
+    images = next(iter(test_dataloader))
 
-    iterator = iter(test_dataloader)
-    images = next(iterator)
-
-    # Make a grid from batch
     output = torchvision.utils.make_grid(images['image'])
 
     imshow(output)
