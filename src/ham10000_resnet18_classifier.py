@@ -13,15 +13,12 @@ https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas
-import torch
-import torchvision
+import torch.optim
 import torchvision.models as models
 from sklearn.model_selection import train_test_split
 from torch.nn import CrossEntropyLoss
 from torch.utils.data import DataLoader
 from torchvision import transforms
-import torch.optim
-
 
 from ham10000_dataset_loader import Ham10000Dataset
 
@@ -35,6 +32,7 @@ def imshow(inp, title=None):
 
 
 if __name__ == '__main__':
+    print('Start')
     # 1. Load and normalize
     # lesion_id,image_id,dx,dx_type,age,sex,localization,dataset
     df = pandas.read_csv("/home/albert/UOC-TFM/dataset/HAM10000_metadata")
@@ -76,16 +74,6 @@ if __name__ == '__main__':
         shuffle=True
     )
 
-    images = next(iter(test_dataloader))
-
-    output = torchvision.utils.make_grid(images['image'])
-
-    print('Showing images:"')
-    for test_image_name in images['label']:
-        print(f"\timage: {test_image_name}")
-
-    imshow(output)
-
     # 2. Define a Convolutional Neural Network
     model = models.resnet18()
 
@@ -97,34 +85,31 @@ if __name__ == '__main__':
     # select device (GPU or CPU)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    for epoch in range(10):  # loop over the dataset multiple times
-
+    for epoch in range(2):  # loop over the dataset multiple times
         running_loss = 0.0
-        for i, data in enumerate(train_dataloader, 0):
-            # get the inputs; data is a list of [inputs, labels]
-            inputs, labels = data
+        images = next(iter(test_dataloader))
+        inputs = images['image']
+        labels = images['label']
 
-            # zero the parameter gradients
-            optimizer.zero_grad()
+        # zero the parameter gradients
+        optimizer.zero_grad()
 
-            # forward + backward + optimize
-            outputs = model(inputs)
-            loss = loss(outputs, labels)
-            loss.backward()
-            optimizer.step()
+        # forward + backward + optimize
+        outputs = model(inputs)
+        loss = loss(outputs, labels)
+        loss.backward()
+        optimizer.step()
 
-            # print statistics
-            running_loss += loss.item()
-            if i % 2000 == 1999:  # print every 2000 mini-batches
-                print('[%d, %5d] loss: %.3f' %
-                      (epoch + 1, i + 1, running_loss / 2000))
-                running_loss = 0.0
+        # print statistics
+        running_loss += loss.item()
+        print('[%d] loss: %.3f' % (epoch + 1, running_loss))
 
     print('Finished Training')
 
     # save trained model
     trained_model_filename = 'ham10000_trained_model.pth'
     torch.save(model.state_dict(), trained_model_filename)
+    print('Done!)')
 
     # TODO
     # https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
@@ -159,4 +144,3 @@ if __name__ == '__main__':
     # Training on multiple GPUs
     #
     # If you want to see even more MASSIVE speedup using all of your GPUs, please check out Optional: Data Parallelism.
-

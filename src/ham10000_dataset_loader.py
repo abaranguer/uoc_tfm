@@ -19,40 +19,23 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
+from src.dx_decoder import dx_to_int
+from src.dx_decoder import dx_to_description
+
 '''
 HAM10000
 metadata header:
 lesion_id, image_id, dx, dx_type, age, sex, localization, dataset
 
 dx fied:
-akiec: Actinic Keratoses i Intraepithelial Carcinoma. --  [1, 0, 0, 0, 0, 0, 0]
-bcc: Basal cell carcinoma.                            --  [0, 1, 0, 0, 0, 0, 0]
-bkl: "Benign keratosis".                              --  [0, 0, 1, 0, 0, 0, 0]     
-df: Dermatofibroma.                                   --  [0, 0, 0, 1, 0, 0, 0]
-nv: Melanocytic nevi.                                 --  [0, 0, 0, 0, 1, 0, 0]
-mel: Melanoma.                                        --  [0, 0, 0, 0, 0, 1, 0]
-vasc: Vascular skin lesions.                          --  [0, 0, 0, 0, 0, 0, 1]
+akiec: Actinic Keratoses i Intraepithelial Carcinoma. --  0
+bcc: Basal cell carcinoma.                            --  1
+bkl: "Benign keratosis".                              --  2
+df: Dermatofibroma.                                   --  3
+nv: Melanocytic nevi.                                 --  4
+mel: Melanoma.                                        --  5
+vasc: Vascular skin lesions.                          --  6
 '''
-
-dx_to_array = {
-    'akiec': np.array([1, 0, 0, 0, 0, 0, 0]),
-    'bcc':   np.array([0, 1, 0, 0, 0, 0, 0]),
-    'bkl':   np.array([0, 0, 1, 0, 0, 0, 0]),
-    'df':    np.array([0, 0, 0, 1, 0, 0, 0]),
-    'nv':    np.array([0, 0, 0, 0, 1, 0, 0]),
-    'mel':   np.array([0, 0, 0, 0, 0, 1, 0]),
-    'vasc':  np.array([0, 0, 0, 0, 0, 0, 1])
-}
-
-dx_to_description = {
-    'akiec': 'Actinic Keratoses and Intraepithelial Carcinoma',
-    'bcc': 'Basal cell carcinoma',
-    'bkl': '"Benign keratosis"',
-    'df': 'Dermatofibroma',
-    'nv': 'Melanocytic nevi',
-    'mel': 'Melanoma',
-    'vasc': 'Vascular skin lesions'
-}
 
 class Ham10000Dataset(Dataset):
     def __init__(self, csv, img_folder, transform):
@@ -74,7 +57,7 @@ class Ham10000Dataset(Dataset):
         return {'image': image,
                 'image_id': targets[0],
                 'dx': targets[1],
-                'label': dx_to_array.get(targets[1])}
+                'label': dx_to_int.get(targets[1])}
 
 def imshow(inp, title=None):
     # imshow for Tensor
