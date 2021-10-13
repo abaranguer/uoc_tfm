@@ -96,12 +96,12 @@ if __name__ == '__main__':
 
         # forward + backward + optimize
         outputs = model(inputs)
-        loss = loss(outputs, labels)
-        loss.backward()
+        loss_current = loss(outputs, labels)
+        loss_current.backward()
         optimizer.step()
 
         # print statistics
-        running_loss += loss.item()
+        running_loss += loss_current.item()
         print('[%d] loss: %.3f' % (epoch + 1, running_loss))
 
     print('Finished Training')
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     # save trained model
     trained_model_filename = 'ham10000_trained_model.pth'
     torch.save(model.state_dict(), trained_model_filename)
-    print('Done!)')
+    print('Done!')
 
     # TODO
     # https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html
