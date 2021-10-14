@@ -3,12 +3,22 @@
 
 dx_to_int = {
     'akiec': 0,
-    'bcc':   1,
-    'bkl':   2,
-    'df':    3,
-    'nv':    4,
-    'mel':   5,
-    'vasc':  6
+    'bcc': 1,
+    'bkl': 2,
+    'df': 3,
+    'nv': 4,
+    'mel': 5,
+    'vasc': 6
+}
+
+int_to_dx = {
+    0: 'akiec',
+    1: 'bcc',
+    2: 'bkl',
+    3: 'df',
+    4: 'nv',
+    5: 'mel',
+    6: 'vasc'
 }
 
 dx_to_description = {

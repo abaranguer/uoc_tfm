@@ -14,12 +14,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas
 import torch.optim
+import torchvision
 import torchvision.models as models
 from sklearn.model_selection import train_test_split
-from torch.nn import CrossEntropyLoss
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
+from dx_decoder import dx_to_description
+from dx_decoder import int_to_dx
 from ham10000_dataset_loader import Ham10000Dataset
 
 
@@ -75,43 +77,52 @@ if __name__ == '__main__':
     )
 
     # 2. Define a ResNet Neural Network
+    print('Loading net parameters...')
     model = models.resnet18()
-
-    # 3. Define a Loss function and optimizer
-    loss = CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-
-    # 4. Train the network
-    # select device (GPU or CPU)
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-    for epoch in range(2):  # loop over the dataset multiple times
-        running_loss = 0.0
-        # images = next(iter(test_dataloader))   <<<<   ATENCIÓ A AQUWEST CANVI, VALIDAR AIXÒ
-        for i, images in enumerate(train_dataloader, 0):
-            inputs = images['image']
-            labels = images['label']
-
-            # zero the parameter gradients
-            optimizer.zero_grad()
-
-            # forward + backward + optimize
-            outputs = model(inputs)
-            loss_current = loss(outputs, labels)
-            loss_current.backward()
-            optimizer.step()
-
-            # print statistics
-            running_loss += loss_current.item()
-            print(f'epoch: {epoch}; i : {i}')
-            if i % 5 == 4:  # print every 2000 mini-batches
-                print('[%d, %5d] loss: %.3f' %
-                      (epoch + 1, i + 1, running_loss / 2000))
-                running_loss = 0.0
-
-    print('Finished Training')
-
-    # save trained model
     trained_model_filename = 'ham10000_trained_model.pth'
-    torch.save(model.state_dict(), trained_model_filename)
-    print('Done!')
+    model.load_state_dict(torch.load(trained_model_filename))
+    model.eval()
+    print('Parameters loaded')
+
+    images = next(iter(test_dataloader))
+
+    # print images
+    output = torchvision.utils.make_grid(images['image'])
+
+    print('Showing images:"')
+    for dx, label, image_id in zip(images['dx'], images['label'], images['image_id']):
+        print(f"\timage: {image_id}.jpg, dx: {dx}, {dx_to_description[dx]}: label: {label}")
+
+    print('Tanca la finestra amb les quatre imatges de prova per a continuar!')
+    imshow(output)
+
+    # get the model predictions:
+    with torch.no_grad():
+        images_as_tensors = images['image']
+        outputs = model(images_as_tensors)
+        _, predicted = torch.max(outputs, 1)
+
+    print('Predicted: ', ' '.join('%5s' % int_to_dx[int(predicted[j])] for j in range(4)))
+
+
+    # analyze full test set
+    correct = 0
+    total = 0
+
+    for i, images in enumerate(test_dataloader, 0):
+        inputs = images['image']
+        labels = images['label']
+
+        print(f'batch {i}')
+
+        # since we're not training, we don't need to calculate the gradients for our outputs
+        with torch.no_grad():
+            # calculate outputs by running images through the network
+            outputs = model(inputs)
+
+            # the class with the highest energy is what we choose as prediction
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+    print('Accuracy of the network on the 2500 test images: %d %%' % (100 * correct / total))

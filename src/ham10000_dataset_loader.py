@@ -19,8 +19,8 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
-from src.dx_decoder import dx_to_int
-from src.dx_decoder import dx_to_description
+from dx_decoder import dx_to_description
+from dx_decoder import dx_to_int
 
 '''
 HAM10000
@@ -36,6 +36,7 @@ nv: Melanocytic nevi.                                 --  4
 mel: Melanoma.                                        --  5
 vasc: Vascular skin lesions.                          --  6
 '''
+
 
 class Ham10000Dataset(Dataset):
     def __init__(self, csv, img_folder, transform):
@@ -57,7 +58,8 @@ class Ham10000Dataset(Dataset):
         return {'image': image,
                 'image_id': targets[0],
                 'dx': targets[1],
-                'label': dx_to_int.get(targets[1])}
+                'label': dx_to_int[targets[1]]}
+
 
 def imshow(inp, title=None):
     # imshow for Tensor
@@ -101,7 +103,7 @@ if __name__ == '__main__':
     output = torchvision.utils.make_grid(images['image'])
 
     print('Showing images:"')
-    for dx, label, image_id  in zip(images['dx'], images['label'], images['image_id'] ) :
+    for dx, label, image_id in zip(images['dx'], images['label'], images['image_id']):
         print(f"\timage: {image_id}.jpg, dx: {dx}, {dx_to_description[dx]}: label: {label}")
 
     imshow(output)
