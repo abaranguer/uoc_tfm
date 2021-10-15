@@ -38,7 +38,9 @@ if __name__ == '__main__':
     # 1. Load and normalize
     # lesion_id,image_id,dx,dx_type,age,sex,localization,dataset
     df = pandas.read_csv("/home/albert/UOC-TFM/dataset/HAM10000_metadata")
-    train_set, test_set = train_test_split(df, test_size=0.25)
+    np.random.seed(0) # set random seed, so I obtain a deterministic sequence of random numbers.
+    train_set, aux_set = train_test_split(df, test_size=0.30)             #  70% 30%
+    validation_set, test_set  = train_test_split(aux_set, test_size=0.50) # 15%, 15%
 
     image_folder = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/300x225/'
 
