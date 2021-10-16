@@ -11,15 +11,15 @@ dx_to_int = {
     'vasc': 6
 }
 
-int_to_dx = {
-    0: 'akiec',
-    1: 'bcc',
-    2: 'bkl',
-    3: 'df',
-    4: 'nv',
-    5: 'mel',
-    6: 'vasc'
-}
+int_to_dx = [
+     'akiec',
+     'bcc',
+     'bkl',
+     'df',
+     'nv',
+     'mel',
+     'vasc'
+]
 
 dx_to_description = {
     'akiec': 'Actinic Keratoses and Intraepithelial Carcinoma',

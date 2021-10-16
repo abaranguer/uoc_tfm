@@ -19,8 +19,8 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
-from dx_decoder import dx_to_description
-from dx_decoder import dx_to_int
+from ham10000_dx_decoder import dx_to_description
+from ham10000_dx_decoder import dx_to_int
 
 '''
 HAM10000
