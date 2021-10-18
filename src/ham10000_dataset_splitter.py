@@ -21,15 +21,22 @@ class Ham10000DatasetSplitter:
         analyzer.show('FULL DATASET')
 
         df = pandas.read_csv(dataset_metadata_path)
-        self.train_set, val_test_set = train_test_split(df, test_size=(percent_val + percent_test))
-        self.validation_set, self.test_set = train_test_split(val_test_set, test_size=percent_test)
+        percent_validation = percent_val + percent_test
+        self.train_set, val_test_set = train_test_split(df, test_size=percent_validation)
+        percent_test_validation = percent_test / percent_validation
+        self.validation_set, self.test_set = train_test_split(val_test_set, test_size=percent_test_validation)
 
         analyzer.analyze_dataframe(self.train_set)
         analyzer.show('TRAIN SET')
+        analyzer.save_dataframe(self.train_set, 'dataframe_train_set.pkl')
+
         analyzer.analyze_dataframe(self.validation_set)
         analyzer.show('VALIDATION SET')
+        analyzer.save_dataframe(self.train_set, 'dataframe_validation_set.pkl')
+
         analyzer.analyze_dataframe(self.test_set)
         analyzer.show('TEST SET')
+        analyzer.save_dataframe(self.train_set, 'dataframe_test_set.pkl')
 
         self.data_transform = transforms.Compose([
             transforms.ToTensor(),

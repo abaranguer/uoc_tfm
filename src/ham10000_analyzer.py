@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pandas
+import time
 
 
 class Ham10000DatasetAnalyzer:
@@ -38,6 +39,11 @@ class Ham10000DatasetAnalyzer:
             print(
                 f'\tclasse: "{self.dataset_classes[dataset_classe_count[0]]}"; num of images: {dataset_classe_count[1]};{(100.0 * dataset_classe_count[1] / self.num_of_images): .2f} % of the dataset.')
         print('------------------------')
+
+    def save_dataframe(self, data_frame, filename):
+        timestamp = time.strftime("%Y%m%d%H%M%S")
+        filename = timestamp + '_' + filename
+        data_frame.to_pickle(filename)
 
 
 if __name__ == '__main__':
