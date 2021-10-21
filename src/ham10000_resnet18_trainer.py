@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import time
+import torch
 import torch.optim
 import torchvision.models as models
+from ham10000_dataset_splitter import Ham10000DatasetSplitter
 from torch.nn import CrossEntropyLoss
 from torch.optim import SGD
-
-from ham10000_dataset_splitter import Ham10000DatasetSplitter
 
 
 class Ham10000ResNet18Trainer:
@@ -20,7 +20,7 @@ class Ham10000ResNet18Trainer:
         self.optimizer = None
         self.which_device = ""
 
-    def run_training(self):
+    def run_training(self, writer):
         self.loss = CrossEntropyLoss()
         self.optimizer = SGD(self.model.parameters(), lr=0.001, momentum=0.9)
 
@@ -40,6 +40,7 @@ class Ham10000ResNet18Trainer:
 
                 outputs = self.model(inputs)
                 loss_current = self.loss(outputs, labels)
+                writer.add_scalar("Loss/train", loss, i)
                 loss_current.backward()
                 self.optimizer.step()
 
@@ -51,24 +52,8 @@ class Ham10000ResNet18Trainer:
                     running_loss = 0.0
 
         print('Finished Training')
+        writer.flush()
 
         timestamp = time.strftime("%Y%m%d%H%M%S")
         trained_model_filename = timestamp + '_ham10000_trained_model.pth'
         torch.save(self.model.state_dict(), trained_model_filename)
-
-
-if __name__ == '__main__':
-    matadata_path = '/home/albert/UOC-TFM/dataset/HAM10000_metadata'
-    images_path = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/300x225/'
-
-    print('Start')
-
-    splitter = Ham10000DatasetSplitter(matadata_path, images_path)
-    train_dataloader = splitter.train_dataloader
-
-    model = models.resnet18()
-
-    trainer = Ham10000ResNet18Trainer(train_dataloader, model)
-    trainer.run_training()
-
-    print('Done!')
