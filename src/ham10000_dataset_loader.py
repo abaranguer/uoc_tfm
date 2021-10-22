@@ -1,15 +1,6 @@
 # /usr/bin/env python3.9
 # -*- coding: utf-8 -*-
 
-'''
-https://pytorch.org/hub/pytorch_vision_resnet/
-https://pytorch.org/vision/stable/models.html
-https://www.programcreek.com/python/example/108007/torchvision.models.resnet18
-https://towardsdatascience.com/beginners-guide-to-loading-image-data-with-pytorch-289c60b7afec
-https://androidkt.com/load-custom-image-datasets-into-pytorch-dataloader-without-using-imagefolder/
-https://pytorch.org/tutorials/beginner/basics/data_tutorial.html
-'''
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas
@@ -27,7 +18,7 @@ HAM10000
 metadata header:
 lesion_id, image_id, dx, dx_type, age, sex, localization, dataset
 
-dx fied:
+dx fields:
 akiec: Actinic Keratoses i Intraepithelial Carcinoma. --  0
 bcc: Basal cell carcinoma.                            --  1
 bkl: "Benign keratosis".                              --  2
@@ -71,19 +62,27 @@ def imshow(inp, title=None):
 
 if __name__ == '__main__':
     # lesion_id,image_id,dx,dx_type,age,sex,localization,dataset
-    df = pandas.read_csv("/home/albert/UOC-TFM/dataset/HAM10000_metadata")
+    metadata_path_lnx = '/home/albert/UOC-TFM/dataset/HAM10000_metadata'
+    metadata_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000'
+    metadata_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/HAM10000_metadata'
+    images_path_lnx = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/300x225/'
+    images_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/300x225'
+    images_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/dataset_ham_10000/ham10000/300x225/'
+
+    df = pandas.read_csv(metadata_path_win)
     train_set, test_set = train_test_split(df, test_size=0.25)
 
-    image_folder = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/300x225/'
+    image_folder = images_path_win
 
     train_data_transform = transforms.Compose([
         transforms.ToTensor(),
+        # TODO: Utilitzar la mitjana i la desviació típica dels canals RGB de les imatges de ham10000
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
 
     train_dataset = Ham10000Dataset(train_set, image_folder, train_data_transform)
     test_dataset = Ham10000Dataset(test_set, image_folder, train_data_transform)
-    BATCH_SIZE = 10
+    BATCH_SIZE = 100
     TEST_BATCH_SIZE = 4
 
     train_dataloader = DataLoader(

@@ -28,18 +28,16 @@ class Ham10000DatasetSplitter:
 
         analyzer.analyze_dataframe(self.train_set)
         analyzer.show('TRAIN SET')
-        analyzer.save_dataframe(self.train_set, 'dataframe_train_set.pkl')
 
         analyzer.analyze_dataframe(self.validation_set)
         analyzer.show('VALIDATION SET')
-        analyzer.save_dataframe(self.train_set, 'dataframe_validation_set.pkl')
 
         analyzer.analyze_dataframe(self.test_set)
         analyzer.show('TEST SET')
-        analyzer.save_dataframe(self.train_set, 'dataframe_test_set.pkl')
 
         self.data_transform = transforms.Compose([
             transforms.ToTensor(),
+            # TODO: Utilitzar la mitjana i la desviació típica dels canals RGB de les imatges de ham10000
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
 

@@ -6,6 +6,18 @@ import time
 
 
 class Ham10000DatasetAnalyzer:
+    '''
+    akiec: 327
+    bcc: 514
+    bkl: 1099
+    df: 115
+    nv: 6705
+    mel: 1113
+    vasc: 142
+
+    total: 10015
+    '''
+
     def __init__(self):
         self.path = None
         self.df = None
@@ -47,9 +59,12 @@ class Ham10000DatasetAnalyzer:
 
 
 if __name__ == '__main__':
-    path = "/home/albert/UOC-TFM/dataset/HAM10000_metadata"
+    path_lnx = '/home/albert/UOC-TFM/dataset/HAM10000_metadata'
+    path_win = 'C:/albert/UOC/dataset/HAM10000_metadata'
+    path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/HAM10000_metadata'
+
     analyzer = Ham10000DatasetAnalyzer()
-    analyzer.analyze_path(path)
+    analyzer.analyze_path(path_win)
     num_of_images, dataset_classes, dataset_classes_counts = analyzer.metadata()
 
     print(f'num of images: {num_of_images}')

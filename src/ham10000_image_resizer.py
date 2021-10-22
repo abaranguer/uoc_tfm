@@ -36,7 +36,13 @@ from os.path import isfile, join
 import cv2
 
 print('Start\n\n')
-dir_base = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/'
+
+path_base_lnx = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/'
+path_base_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/'
+path_base_clb = '/content/drive/MyDrive/UOC-TFM/dataset/dataset_ham_10000/ham10000/'
+
+path_base = path_base_win
+
 original_size_folder = 'original-image-set_600x450'
 folders = ['60x45',
            '120x90',
@@ -48,7 +54,7 @@ folders = ['60x45',
            '480x360',
            '540x405']
 
-path_original_size_folder = dir_base + original_size_folder
+path_original_size_folder = path_base + original_size_folder
 print(path_original_size_folder)
 
 imagefiles = [imagefile for imagefile in listdir(path_original_size_folder) if
@@ -66,7 +72,7 @@ for imagefile in imagefiles:
         percent = 0.1 * i
         percent100 = 100.0 * percent
         image_scaled = cv2.resize(image, None, fx=percent, fy=percent, interpolation=cv2.INTER_LINEAR)
-        cv2.imwrite(dir_base + folders[i - 1] + '/' + imagefile, image_scaled)
+        cv2.imwrite(path_base + folders[i - 1] + '/' + imagefile, image_scaled)
 
     if counter % 100 == 0:
         print(f'\n\n{counter} files processed')

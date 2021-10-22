@@ -56,18 +56,28 @@ if __name__ == '__main__':
     print('Start')
     # 1. Load and normalize
     # lesion_id,image_id,dx,dx_type,age,sex,localization,dataset
-    df = pandas.read_csv("/home/albert/UOC-TFM/dataset/HAM10000_metadata")
+    metadata_path_lnx = '/home/albert/UOC-TFM/dataset/HAM10000_metadata'
+    metadata_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000'
+    metadata_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/HAM10000_metadata'
+
+    metadata_path = metadata_path_win
+    df = pandas.read_csv(metadata_path)
     np.random.seed(0)  # set random seed, so I obtain a deterministic sequence of random numbers.
     train_set, aux_set = train_test_split(df, test_size=0.30)  # 70% 30%
     validation_set, test_set = train_test_split(aux_set, test_size=0.50)  # 15%, 15%
 
-    image_folder = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/300x225/'
+    images_path_lnx = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/300x225/'
+    images_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/300x225'
+    images_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/dataset_ham_10000/ham10000/300x225/'
+
+    image_folder = images_path_win
 
     train_data_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
 
+    # TODO: Utilitzar la mitjana i la desviació típica dels canals RGB de les imatges de ham10000
     '''
     '# training data
     train_data_transform = transforms.Compose([

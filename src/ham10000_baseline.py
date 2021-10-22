@@ -17,12 +17,17 @@ def log_time(message):
 
 
 if __name__ == '__main__':
-    matadata_path = '/home/albert/UOC-TFM/dataset/HAM10000_metadata'
-    images_path = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/300x225/'
+    metadata_path_lnx = '/home/albert/UOC-TFM/dataset/HAM10000_metadata'
+    metadata_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000'
+    metadata_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/HAM10000_metadata'
+    images_path_lnx = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/300x225'
+    images_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/300x225'
+    images_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/dataset_ham_10000/ham10000/300x225'
+
     log_time('Start time:')
 
     print('1 . Splits training, validation and test sets')
-    splitter = Ham10000DatasetSplitter(matadata_path, images_path, percent_val=.30, percent_test=.30)
+    splitter = Ham10000DatasetSplitter(metadata_path_win, images_path_win, percent_val=.30, percent_test=.30)
     train_dataloader = splitter.train_dataloader
     validation_dataloader = splitter.validation_dataloader
     test_dataloader = splitter.test_dataloader
@@ -34,7 +39,11 @@ if __name__ == '__main__':
     trainer = Ham10000ResNet18Trainer(train_dataloader, model, epochs=5)
 
     log_time('\tTraining start time:')
-    writer = SummaryWriter()
+    tensorboard_logs_lnx = '/home/albert/UOC-TFM/tensorboard-logs'
+    tensorboard_logs_win = 'C:/albert/UOC/tensorboard-logs'
+    tensorboard_logs_clb = '/content/drive/MyDrive/UOC-TFM/tensorboard-logs'
+
+    writer = SummaryWriter(log_dir=tensorboard_logs_win)
     trainer.run_training(writer)
 
     log_time('\tTraining end time:')

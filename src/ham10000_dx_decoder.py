@@ -1,6 +1,7 @@
 # /usr/bin/env python3.9
 # -*- coding: utf-8 -*-
 
+# TODO: atenció! Sebla que NO és segur utilitzar aquesta taula!
 dx_to_int = {
     'akiec': 0,
     'bcc': 1,
