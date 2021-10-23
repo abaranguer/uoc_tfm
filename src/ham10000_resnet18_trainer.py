@@ -49,8 +49,12 @@ class Ham10000ResNet18Trainer:
 
                 loss_current_value = loss_current.item()
                 running_loss += loss_current_value
+                # running_loss * batch_size / num_images
+                running_loss_per_train_images = running_loss / num_images
+
                 writer.add_scalar("loss/steps", loss_current_value, num_steps)
-                writer.add_scalar("running_loss/num_images", running_loss * batch_size  / num_images, num_images)
+                writer.add_scalar("running_loss/num_images", running_loss_per_train_images, num_images)
+
                 num_steps += 1
                 print(f'epoch: {epoch}; i : {i} ')
 

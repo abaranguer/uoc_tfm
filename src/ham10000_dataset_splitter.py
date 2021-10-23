@@ -22,7 +22,9 @@ class Ham10000DatasetSplitter:
 
         df = pandas.read_csv(dataset_metadata_path)
         percent_validation = percent_val + percent_test
-        self.train_set, val_test_set = train_test_split(df, test_size=percent_validation)
+
+        # Why 42? Don't panic! Read the "Hitchhikers guide to galaxy"!
+        self.train_set, val_test_set = train_test_split(df, test_size=percent_validation, random_state=42)
         percent_test_validation = percent_test / percent_validation
         self.validation_set, self.test_set = train_test_split(val_test_set, test_size=percent_test_validation)
 

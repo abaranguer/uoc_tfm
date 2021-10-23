@@ -7,6 +7,7 @@ import pandas
 import torch.optim
 import torchvision
 import torchvision.models as models
+from sklearn.metrics import average_precision_score
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from torchvision import transforms
@@ -30,8 +31,6 @@ class Ham10000ResNet18Validator:
             inputs = images['image']
             labels = images['label']
 
-            print(f'batch {i}')
-
             with torch.no_grad():
                 outputs = self.model(inputs)
 
@@ -39,10 +38,16 @@ class Ham10000ResNet18Validator:
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
+                mAP = average_precision_score(labels.numpy(), predicted.numpy())
+
         self.accuracy = 100 * correct / total
         print(f'num of correct predicted images (True positives): {correct}')
         print(f'num of images : {total}')
         print(f'Accuracy of the network on the test images: {self.accuracy: .4f}%')
+
+
+
+
 
 
 def imshow(inp, title=None):
