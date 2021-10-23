@@ -23,7 +23,7 @@ class Ham10000ResNet18Predictor:
 
         with torch.no_grad():
             images_as_tensors = images['image']
-            outputs = model(images_as_tensors)
+            outputs = self.model(images_as_tensors)
             _, predicted = torch.max(outputs, 1)
 
         print('Predicted: ', ' '.join('%5s' % int_to_dx[int(predicted[j])] for j in range(len(predicted))))
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     validation_set, test_set = train_test_split(aux_set, test_size=0.50)  # 15%, 15%
 
     images_path_lnx = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/300x225/'
-    images_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/300x225'
+    images_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/300x225/'
     images_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/dataset_ham_10000/ham10000/300x225/'
 
     image_folder = images_path_win

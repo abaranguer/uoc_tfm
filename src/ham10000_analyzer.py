@@ -48,8 +48,10 @@ class Ham10000DatasetAnalyzer:
         print(f'num of images: {self.num_of_images}')
         print(f'num of classes: {self.dataset_classes}')
         for dataset_classe_count in enumerate(self.dataset_classes_counts):
+            class_name = self.dataset_classes_counts.index[dataset_classe_count[0]]
+            class_count = dataset_classe_count[1]
             print(
-                f'\tclasse: "{self.dataset_classes[dataset_classe_count[0]]}"; num of images: {dataset_classe_count[1]};{(100.0 * dataset_classe_count[1] / self.num_of_images): .2f} % of the dataset.')
+                f'\tclasse: "{class_name}"; num of images: {class_count};{(100.0 * class_count / self.num_of_images): .2f} % of the dataset.')
         print('------------------------')
 
     def save_dataframe(self, data_frame, filename):

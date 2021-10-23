@@ -29,27 +29,30 @@ class Ham10000ResNet18Trainer:
         print(f'using {self.which_device} device')
         device = torch.device(self.which_device)
 
-        for epoch in range(self.epochs):  # loop over the dataset multiple times
-            running_loss = 0.0
+        num_steps = 1
+        running_loss = 0.0
+        num_images = 0.0
 
+        for epoch in range(self.epochs):  # loop over the dataset multiple times
             for i, images in enumerate(self.train_dataloader, 0):
                 inputs = images['image']
                 labels = images['label']
+                batch_size = inputs.size(0)
+                num_images += batch_size
 
                 self.optimizer.zero_grad()
 
                 outputs = self.model(inputs)
                 loss_current = self.loss(outputs, labels)
-                writer.add_scalar("Loss/train", loss, i)
                 loss_current.backward()
                 self.optimizer.step()
 
-                running_loss += loss_current.item()
-                print(f'epoch: {epoch}; i : {i}')
-                if i % 100 == 99:  # print every 100 mini-batches
-                    print('[%d, %5d] loss: %.3f' %
-                          (epoch + 1, i + 1, running_loss / 100))
-                    running_loss = 0.0
+                loss_current_value = loss_current.item()
+                running_loss += loss_current_value
+                writer.add_scalar("loss/steps", loss_current_value, num_steps)
+                writer.add_scalar("running_loss/num_images", running_loss * batch_size  / num_images, num_images)
+                num_steps += 1
+                print(f'epoch: {epoch}; i : {i} ')
 
         print('Finished Training')
         writer.flush()

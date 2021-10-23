@@ -65,11 +65,11 @@ class Ham10000DatasetSplitter:
         self.validation_dataloader = DataLoader(
             self.validation_dataset,
             batch_size=VAL_BATCH_SIZE,
-            shuffle=True
+            shuffle=False
         )
 
         self.test_dataloader = DataLoader(
             self.test_dataset,
             batch_size=TEST_BATCH_SIZE,
-            shuffle=True
+            shuffle=False
         )
