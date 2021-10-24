@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import time
+
 import torch
 import torch.optim
-import torchvision.models as models
-from ham10000_dataset_splitter import Ham10000DatasetSplitter
 from torch.nn import CrossEntropyLoss
 from torch.optim import SGD
 
@@ -49,7 +48,6 @@ class Ham10000ResNet18Trainer:
 
                 loss_current_value = loss_current.item()
                 running_loss += loss_current_value
-                # running_loss * batch_size / num_images
                 running_loss_per_train_images = running_loss / num_images
 
                 writer.add_scalar("loss/steps", loss_current_value, num_steps)
@@ -61,6 +59,12 @@ class Ham10000ResNet18Trainer:
         print('Finished Training')
         writer.flush()
 
+
+        resnet18_parameters_path_lnx = 'C:/albert/UOC/resnet18_parameters/'
+        resnet18_parameters_path_clb = 'C:/albert/UOC/resnet18_parameters/'
+        resnet18_parameters_path_win = 'C:/albert/UOC/resnet18_parameters/'
+
+        resnet18_parameters_path = resnet18_parameters_path_win
         timestamp = time.strftime("%Y%m%d%H%M%S")
-        trained_model_filename = timestamp + '_ham10000_trained_model.pth'
+        trained_model_filename = resnet18_parameters_path + timestamp + '_ham10000_trained_model.pth'
         torch.save(self.model.state_dict(), trained_model_filename)

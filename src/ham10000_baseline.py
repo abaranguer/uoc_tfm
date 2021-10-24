@@ -37,6 +37,7 @@ if __name__ == '__main__':
     model = models.resnet18()
 
     print('3 - train model')
+    model.train()
     trainer = Ham10000ResNet18Trainer(train_dataloader, model, epochs=100)
 
     log_time('\tTraining start time:')
@@ -49,13 +50,16 @@ if __name__ == '__main__':
 
     log_time('\tTraining end time:')
 
-    #print('4 - validate model')
-    #validator = Ham10000ResNet18Validator(model, validation_dataloader)
-    #validator.run_validation()
+    print('4 - validate model')
+    validator = Ham10000ResNet18Validator(model, validation_dataloader)
+    validator.run_validation()
 
-    #print('5 - make predictions')
-    #predictor = Ham10000ResNet18Predictor(model, test_dataloader)
-    #predictor.run_predictor()
+    print('5 - make predictions')
+    predictor = Ham10000ResNet18Predictor(model, test_dataloader)
+    predictor.run_predictor()
 
     writer.close()
+
     log_time('Done!')
+
+

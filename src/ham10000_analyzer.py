@@ -54,11 +54,31 @@ class Ham10000DatasetAnalyzer:
                 f'\tclasse: "{class_name}"; num of images: {class_count};{(100.0 * class_count / self.num_of_images): .2f} % of the dataset.')
         print('------------------------')
 
-    def save_dataframe(self, data_frame, filename):
-        timestamp = time.strftime("%Y%m%d%H%M%S")
-        filename = timestamp + '_' + filename
-        data_frame.to_pickle(filename)
+        self.save_dataframe(title)
 
+    def save_dataframe(self, title):
+        dataframe_path_lnx = 'C:/albert/UOC/dataframes/'
+        dataframe_path_win = 'C:/albert/UOC/dataframes/'
+        dataframe_path_clb = 'C:/albert/UOC/dataframes/'
+        dataframe_path = dataframe_path_win
+
+        timestamp = time.strftime("%Y%m%d%H%M%S")
+        filename = dataframe_path + timestamp + '_' + title + ".csv"
+
+        lines = []
+
+        num_of_images = len(self.df.values)
+        for i in range(num_of_images):
+            lesion_id = self.df.values[i][0]
+            image_id = self.df.values[i][1]
+            dx = self.df.values[i][2]
+            line = f'"{lesion_id}","{image_id}","{dx}"\n'
+            lines.append(line)
+
+        with open(filename, 'w') as df_file:
+            df_file.writelines(lines)
+
+        print(f'Saved {filename}')
 
 if __name__ == '__main__':
     path_lnx = '/home/albert/UOC-TFM/dataset/HAM10000_metadata'

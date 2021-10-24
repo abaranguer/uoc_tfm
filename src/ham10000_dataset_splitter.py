@@ -16,26 +16,26 @@ class Ham10000DatasetSplitter:
                  percent_val=0.15, percent_test=0.15,
                  BATCH_SIZE=100, VAL_BATCH_SIZE=20, TEST_BATCH_SIZE=20):
         np.random.seed(0)
-        analyzer = Ham10000DatasetAnalyzer()
-        analyzer.analyze_path(dataset_metadata_path)
-        analyzer.show('FULL DATASET')
+        self.analyzer = Ham10000DatasetAnalyzer()
+        self.analyzer.analyze_path(dataset_metadata_path)
+        self.analyzer.show('FULL DATASET')
 
         df = pandas.read_csv(dataset_metadata_path)
         percent_validation = percent_val + percent_test
 
-        # Why 42? Don't panic! Read the "Hitchhikers guide to galaxy"!
+        # 42? Don't panic! Read the "Hitchhikers guide to galaxy"!
         self.train_set, val_test_set = train_test_split(df, test_size=percent_validation, random_state=42)
         percent_test_validation = percent_test / percent_validation
         self.validation_set, self.test_set = train_test_split(val_test_set, test_size=percent_test_validation)
 
-        analyzer.analyze_dataframe(self.train_set)
-        analyzer.show('TRAIN SET')
+        self.analyzer.analyze_dataframe(self.train_set)
+        self.analyzer.show('TRAIN SET')
 
-        analyzer.analyze_dataframe(self.validation_set)
-        analyzer.show('VALIDATION SET')
+        self.analyzer.analyze_dataframe(self.validation_set)
+        self.analyzer.show('VALIDATION SET')
 
-        analyzer.analyze_dataframe(self.test_set)
-        analyzer.show('TEST SET')
+        self.analyzer.analyze_dataframe(self.test_set)
+        self.analyzer.show('TEST SET')
 
         self.data_transform = transforms.Compose([
             transforms.ToTensor(),
