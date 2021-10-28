@@ -19,9 +19,9 @@ import torch.optim
 # https://towardsdatascience.com/confusion-matrix-for-your-multi-class-machine-learning-model-ff9aa3bf7826
 
 class Ham10000ResNet18Validator:
-    def __init__(self, model, splitter):
+    def __init__(self, model, validation_dataloader):
         self.model = model
-        self.validation_dataloader = splitter.validation_dataloader
+        self.validation_dataloader = validation_dataloader
 
         self.class_names = ['', '', '', '', '', '', '']
 

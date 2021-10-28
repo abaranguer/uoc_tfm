@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
     log_time('\tValidation start time:')
     print('3 - validate model')
-    validator = Ham10000ResNet18Validator(model, splitter)
+    validator = Ham10000ResNet18Validator(model, validation_dataloader)
     validator.run_validation()
     log_time('\tValidation end time:')
 
