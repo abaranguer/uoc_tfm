@@ -23,7 +23,7 @@ if __name__ == '__main__':
     images_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/300x225/'
     images_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/dataset_ham_10000/ham10000/300x225/'
     resnet18_parameters_path_win = 'C:/albert/UOC/resnet18_parameters/'
-    resnet18_parameters_filename = '20211023193111_ham10000_trained_model.pth'
+    resnet18_parameters_filename = '20211030161151_ham10000_trained_model.pth'
 
     print('1 - Splits training, validation and test sets')
     splitter = Ham10000DatasetSplitter(metadata_path_win, images_path_win, percent_val=.15, percent_test=.15)
@@ -35,7 +35,6 @@ if __name__ == '__main__':
     model = models.resnet18()
     resnet18_parameters = resnet18_parameters_path_win + resnet18_parameters_filename
     model.load_state_dict(torch.load(resnet18_parameters))
-    model.eval()
 
     log_time('\tValidation start time:')
     print('3 - validate model')

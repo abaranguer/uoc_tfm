@@ -7,7 +7,9 @@ import torch
 import torch.optim
 from torch.nn import CrossEntropyLoss
 from torch.optim import SGD
-
+import torchvision
+import matplotlib.pyplot as plt
+import numpy as np
 
 class Ham10000ResNet18Trainer:
 
@@ -18,6 +20,7 @@ class Ham10000ResNet18Trainer:
         self.loss = None
         self.optimizer = None
         self.which_device = ""
+        self.model.train()
 
     def run_training(self, writer):
         self.loss = CrossEntropyLoss()
@@ -33,11 +36,12 @@ class Ham10000ResNet18Trainer:
         num_images = 0.0
 
         for epoch in range(self.epochs):  # loop over the dataset multiple times
-            for i, images in enumerate(self.train_dataloader, 0):
-                inputs = images['image']
-                labels = images['label']
+            for i, images_batch in enumerate(self.train_dataloader, 0):
+                inputs = images_batch['image']
+                labels = images_batch['label']
                 batch_size = inputs.size(0)
                 num_images += batch_size
+                self.display_batch(inputs, writer)
 
                 self.optimizer.zero_grad()
 
@@ -59,7 +63,6 @@ class Ham10000ResNet18Trainer:
         print('Finished Training')
         writer.flush()
 
-
         resnet18_parameters_path_lnx = 'C:/albert/UOC/resnet18_parameters/'
         resnet18_parameters_path_clb = 'C:/albert/UOC/resnet18_parameters/'
         resnet18_parameters_path_win = 'C:/albert/UOC/resnet18_parameters/'
@@ -68,3 +71,13 @@ class Ham10000ResNet18Trainer:
         timestamp = time.strftime("%Y%m%d%H%M%S")
         trained_model_filename = resnet18_parameters_path + timestamp + '_ham10000_trained_model.pth'
         torch.save(self.model.state_dict(), trained_model_filename)
+
+    def display_batch(self, images_batch, writer):
+        grid_img = torchvision.utils.make_grid(images_batch, nrow=10)
+        self.matplotlib_imshow(grid_img)
+        writer.add_image('Current image batch (normalized)', grid_img)
+
+    # see https://pytorch.org/tutorials/intermediate/tensorboard_tutorial.html
+    def matplotlib_imshow(self, grid_img):
+        np_grid_img = grid_img.numpy()
+        plt.imshow(np.transpose(np_grid_img, (1, 2, 0)))

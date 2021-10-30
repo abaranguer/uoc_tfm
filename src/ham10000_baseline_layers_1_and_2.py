@@ -3,6 +3,8 @@
 
 import time
 
+from model import Model
+
 import torchvision.models as models
 from torch.utils.tensorboard import SummaryWriter
 
@@ -28,15 +30,16 @@ if __name__ == '__main__':
     log_time('Start time:')
 
     print('1 . Splits training, validation and test sets')
-    metadata_path = metadata_path_lnx
-    images_path = images_path_lnx
+    metadata_path = metadata_path_win
+    images_path = images_path_win
     splitter = Ham10000DatasetSplitter(metadata_path, images_path, percent_val=0.15, percent_test=0.15)
     train_dataloader = splitter.train_dataloader
     validation_dataloader = splitter.validation_dataloader
     test_dataloader = splitter.test_dataloader
 
     print('2 - create ResNet18 model')
-    model = models.resnet18()
+    #model = models.resnet18()
+    model_2_layers = Model(2)
 
     # freeze all layers except 1 and 2
 
@@ -57,21 +60,12 @@ if __name__ == '__main__':
 
         return x
     '''
-    model.conv1.requires_grad_(True)
-    model.bn1.requires_grad_(True)
-    model.relu.requires_grad_(True)
-    model.maxpool.requires_grad_(True)
-    model.layer1.requires_grad_(True)
-    model.layer2.requires_grad_(True)
 
-    model.layer3.requires_grad_(False)
-    model.layer4.requires_grad_(False)
-    model.avgpool.requires_grad_(False)
-    model.fc.requires_grad_(False)
+    # aquí hacemos forward
 
     print('3 - train model')
-    model.train()
-    trainer = Ham10000ResNet18Trainer(train_dataloader, model, epochs=5)
+    model_2_layers.train()
+    trainer = Ham10000ResNet18Trainer(train_dataloader, model_2_layers, epochs=5)
 
     log_time('\tTraining start time:')
     tensorboard_logs_lnx = '/home/albert/UOC-TFM/tensorboard-logs'
@@ -84,15 +78,13 @@ if __name__ == '__main__':
     log_time('\tTraining end time:')
 
     print('4 - validate model')
-    validator = Ham10000ResNet18Validator(model, validation_dataloader)
+    validator = Ham10000ResNet18Validator(model_2_layers, validation_dataloader)
     validator.run_validation()
 
     print('5 - make predictions')
-    predictor = Ham10000ResNet18Predictor(model, test_dataloader)
+    predictor = Ham10000ResNet18Predictor(model_2_layers, test_dataloader)
     predictor.run_predictor()
 
     writer.close()
 
     log_time('Done!')
-
-

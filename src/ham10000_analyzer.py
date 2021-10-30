@@ -60,7 +60,7 @@ class Ham10000DatasetAnalyzer:
         dataframe_path_lnx = '/home/albert/UOC-TFM/dataframes/'
         dataframe_path_win = 'C:/albert/UOC/dataframes/'
         dataframe_path_clb = '/content/drive/MyDrive/UOC-TFM/dataframes/'
-        dataframe_path = dataframe_path_lnx
+        dataframe_path = dataframe_path_win
 
         timestamp = time.strftime("%Y%m%d%H%M%S")
         filename = dataframe_path + timestamp + '_' + title + ".csv"

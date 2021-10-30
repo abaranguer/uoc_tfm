@@ -28,7 +28,7 @@ if __name__ == '__main__':
     log_time('Start time:')
 
     print('1 . Splits training, validation and test sets')
-    splitter = Ham10000DatasetSplitter(metadata_path_win, images_path_win, percent_val=0.495, percent_test=0.495)
+    splitter = Ham10000DatasetSplitter(metadata_path_win, images_path_win, percent_val=0.15, percent_test=0.15)
     train_dataloader = splitter.train_dataloader
     validation_dataloader = splitter.validation_dataloader
     test_dataloader = splitter.test_dataloader
@@ -37,8 +37,7 @@ if __name__ == '__main__':
     model = models.resnet18()
 
     print('3 - train model')
-    model.train()
-    trainer = Ham10000ResNet18Trainer(train_dataloader, model, epochs=100)
+    trainer = Ham10000ResNet18Trainer(train_dataloader, model, epochs=5)
 
     log_time('\tTraining start time:')
     tensorboard_logs_lnx = '/home/albert/UOC-TFM/tensorboard-logs'
