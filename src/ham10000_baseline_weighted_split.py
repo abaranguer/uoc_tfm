@@ -6,7 +6,7 @@ import time
 import torchvision.models as models
 from torch.utils.tensorboard import SummaryWriter
 
-from ham10000_dataset_splitter import Ham10000DatasetSplitter
+from ham10000_dataset_weighted_splitter import Ham10000DatasetWeightedSplitter
 from ham10000_resnet18_predictor import Ham10000ResNet18Predictor
 from ham10000_resnet18_trainer import Ham10000ResNet18Trainer
 from ham10000_resnet18_validator import Ham10000ResNet18Validator
@@ -32,7 +32,7 @@ if __name__ == '__main__':
     torch.manual_seed(0)
 
     print('1 . Splits training, validation and test sets')
-    splitter = Ham10000DatasetSplitter(metadata_path_win, images_path_win, percent_val=0.15, percent_test=0.15)
+    splitter = Ham10000DatasetWeightedSplitter(metadata_path_win, images_path_win, percent_val=0.15, percent_test=0.15)
     train_dataloader = splitter.train_dataloader
     validation_dataloader = splitter.validation_dataloader
     test_dataloader = splitter.test_dataloader
@@ -50,7 +50,6 @@ if __name__ == '__main__':
 
     writer = SummaryWriter(log_dir=tensorboard_logs_win)
     trainer.run_training(writer)
-
     log_time('\tTraining end time:')
 
     print('4 - validate model')
@@ -64,5 +63,4 @@ if __name__ == '__main__':
     writer.close()
 
     log_time('Done!')
-
 

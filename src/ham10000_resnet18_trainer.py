@@ -20,7 +20,50 @@ class Ham10000ResNet18Trainer:
         self.loss = None
         self.optimizer = None
         self.which_device = ""
+        self.num_akiec = 0
+        self.num_bcc = 0
+        self.num_bkl = 0
+        self.num_df = 0
+        self.num_mel = 0
+        self.num_nv = 0
+        self.num_vasc = 0
+        self.num_total = 0
+
         self.model.train()
+
+    def update_counters(self, dx):
+        for current_dx in dx:
+            self.num_total += 1
+
+            if (self.num_total % 1000 ) == 0:
+                print(f'Current : {self.num_total}')
+
+            if current_dx == 'akiec':
+                self.num_akiec += 1
+            elif current_dx == 'bcc':
+                self.num_bcc += 1
+            elif current_dx == 'bkl':
+                self.num_bkl += 1
+            elif current_dx == 'df':
+                self.num_df += 1
+            elif current_dx == 'mel':
+                self.num_mel += 1
+            elif current_dx == 'nv':
+                self.num_nv += 1
+            elif current_dx == 'vasc':
+                self.num_vasc += 1
+
+    def show_counters(self):
+        print(f'total num of images: {self.num_total}')
+        print('Number o samples per class:')
+        print(f'\takiec: {self.num_akiec}  ({100.0 * self.num_akiec/self.num_total:.2f} %)')
+        print(f'\t  bcc: {self.num_bcc}  ({100.0 * self.num_bcc/self.num_total:.2f} %)')
+        print(f'\t  bkl: {self.num_bkl}  ({100.0 * self.num_bkl/self.num_total:.2f} %)')
+        print(f'\t   df: {self.num_df}  ({100.0 * self.num_df/self.num_total:.2f} %)')
+        print(f'\t  mel: {self.num_mel}  ({100.0 * self.num_mel/self.num_total:.2f} %)')
+        print(f'\t   nv: {self.num_nv}  ({100.0 * self.num_nv/self.num_total:.2f} %)')
+        print(f'\t vasc: {self.num_vasc}  ({100.0 * self.num_vasc/self.num_total:.2f} %)')
+
 
     def run_training(self, writer):
         self.loss = CrossEntropyLoss()
@@ -39,6 +82,10 @@ class Ham10000ResNet18Trainer:
             for i, images_batch in enumerate(self.train_dataloader, 0):
                 inputs = images_batch['image']
                 labels = images_batch['label']
+                dx = images_batch['dx']
+
+                self.update_counters(dx)
+
                 batch_size = inputs.size(0)
                 num_images += batch_size
                 self.display_batch(inputs, writer)
@@ -50,6 +97,7 @@ class Ham10000ResNet18Trainer:
                 loss_current.backward()
                 self.optimizer.step()
 
+
                 loss_current_value = loss_current.item()
                 running_loss += loss_current_value
                 running_loss_per_train_images = running_loss / num_images
@@ -60,6 +108,7 @@ class Ham10000ResNet18Trainer:
                 num_steps += 1
                 print(f'epoch: {epoch}; i : {i} ')
 
+        self.show_counters()
         print('Finished Training')
         writer.flush()
 
@@ -71,6 +120,8 @@ class Ham10000ResNet18Trainer:
         timestamp = time.strftime("%Y%m%d%H%M%S")
         trained_model_filename = resnet18_parameters_path + timestamp + '_ham10000_trained_model.pth'
         torch.save(self.model.state_dict(), trained_model_filename)
+        
+
 
     def display_batch(self, images_batch, writer):
         grid_img = torchvision.utils.make_grid(images_batch, nrow=10)

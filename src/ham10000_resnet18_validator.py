@@ -87,7 +87,6 @@ class Ham10000ResNet18Validator:
         for i, images in enumerate(self.validation_dataloader, 0):
             inputs = images['image']
             labels = images['label']
-            dx = images['dx']
 
             with torch.no_grad():
                 outputs = self.model(inputs)
