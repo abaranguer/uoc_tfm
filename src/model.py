@@ -23,6 +23,8 @@ class Model(torch.nn.Module):
         self.classifier = torch.nn.Linear(mapper[num_layers], 7)
         self.num_layers = num_layers
 
+        self.maxpool2d_test = torch.nn.MaxPool2d(3, stride=2)
+
         for x in range(num_layers + 1, 5):
             self.backbone.__delattr__(f"layer{x}")
 
@@ -45,18 +47,32 @@ class Model(torch.nn.Module):
         for i in range(1, self.num_layers + 1):
             x = self.backbone.__getattr__(f"layer{i}")(x)
 
-        x = self.backbone.avgpool(x)    #  TODO. Output más pequeño.
-        x = torch.flatten(x, 1)
+        # x = self.backbone.avgpool(x)    # Original .
+        x = self.maxpool2d_test(x)        # Output més petit.  shape = (100, 128, 5, 7)
+
+        x = torch.flatten(x, 1)   # (<class 'RuntimeError'>, RuntimeError('mat1 and mat2 shapes cannot be multiplied (100x4480 and 128x7)'),
+                                  # <traceback object at 0x0000016230FD4480>)
+        '''
+        def linear(input: Tensor, weight: Tensor, bias: Optional[Tensor] = None) -> Tensor:
+            r"""
+            Applies a linear transformation to the incoming data: :math:`y = xA^T + b`.
+        
+            This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
+        
+            Shape:
+        
+                - Input: :math:`(N, *, in\_features)` N is the batch size, `*` means any number of
+                  additional dimensions
+                - Weight: :math:`(out\_features, in\_features)`
+                - Bias: :math:`(out\_features)`
+                - Output: :math:`(N, *, out\_features)`
+            """
+            if has_torch_function_variadic(input, weight, bias):
+                return handle_torch_function(linear, (input, weight, bias), input, weight, bias=bias)
+            return torch._C._nn.linear(input, weight, bias)     
+        '''
+
         x = self.classifier(x)
-
-        # TODO
-        '''
-        imágenes más pequeñas
-        maxpool x avgpool
-        añadir algo por el estilo de self.maxpool = torch.nn.MaxPool()
-        o torch.nn.functional.max_pool
-        '''
-
 
         return x
 

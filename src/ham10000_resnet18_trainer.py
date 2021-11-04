@@ -97,7 +97,6 @@ class Ham10000ResNet18Trainer:
                 loss_current.backward()
                 self.optimizer.step()
 
-
                 loss_current_value = loss_current.item()
                 running_loss += loss_current_value
                 running_loss_per_train_images = running_loss / num_images
