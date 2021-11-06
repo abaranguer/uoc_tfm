@@ -95,8 +95,10 @@ class Ham10000ResNet18Validator:
             with torch.no_grad():
                 outputs = self.model(inputs)
 
-                predicted = outputs.data[:,:7] # Aquesta és la clau per a calcular l'mAP:
-                                               # Les 7 primeres columnes són els scores.
+                # Aquesta és la clau per a calcular l'mAP:
+                # Les 7 primeres columnes són els scores.
+                predicted = outputs.data[:, :7]
+
                 for pred_row in predicted:
                     normalized_pred_row = torch.softmax(pred_row, dim=0)
                     all_predicted_tuples.append(normalized_pred_row)
@@ -132,7 +134,6 @@ class Ham10000ResNet18Validator:
 
         print(f'\n\n Confusion matrix ("Handmade")')
         self.handmade_metrics.show_naive_metrics()
-
 
         print(f'\n\n Confusion matrix (sklearn.metrics)')
         validation_set_confusion_matrix = sklearn.metrics.confusion_matrix(all_truth,
