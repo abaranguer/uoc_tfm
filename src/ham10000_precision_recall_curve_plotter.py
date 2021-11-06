@@ -74,3 +74,68 @@ class Ham10000PrecisionRecallCurvePlotter:
         plt.title("ROC curve")
         plt.show()
 '''
+
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import PrecisionRecallDisplay
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+
+random.seed(42)
+ground_truth = []
+predicted = []
+
+for i in range(50):
+    if random.random() > .75:
+        ground_truth.append(1)
+        if random.random() > .75:
+            predicted.append(0.75 + 0.25 * random.random())
+        else:
+            predicted.append(0.75 * random.random())
+    else:
+        ground_truth.append(0)
+        if random.random() > .75:
+            predicted.append(0.75 * random.random())
+        else:
+            predicted.append(0.75 + 0.25 * random.random())
+
+y_true = np.array(ground_truth)
+y_scores = np.array(predicted)
+
+precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
+
+disp = PrecisionRecallDisplay(precision, recall)
+disp.plot()
+plt.show()
+
+'''            
+tp = 0
+fp = 0
+tn = 0
+fn = 0
+
+for i in range(50):
+    if (ground_truth[i] == predicted[i]) and (ground_truth[i] == 'S'):
+        tp = tp + 1
+    elif (ground_truth[i] == predicted[i]) and (ground_truth[i] != 'S'):
+        tn = tn + 1
+    elif (ground_truth[i] != predicted[i]) and (ground_truth[i] == 'S'):
+        fn = fn + 1
+    elif (ground_truth[i] != predicted[i]) and (predicted[i] == 'S'):
+        fp = fp + 1
+
+
+    The precision is the ratio tp / (tp + fp) where tp is the number of true positives and fp the number of false positives. 
+    The precision is intuitively the ability of the classifier not to label as positive a sample that is negative.
+
+    The recall is the ratio tp / (tp + fn) where tp is the number of true positives and fn the number of false negatives. 
+    The recall is intuitively the ability of the classifier to find all the positive samples.
+
+
+    precision = tp / (tp + fp)
+
+    recall = tp / (tp + fn )
+'''
+
+
+

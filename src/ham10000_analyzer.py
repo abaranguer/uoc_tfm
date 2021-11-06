@@ -3,20 +3,10 @@
 
 import pandas
 import time
+import ham10000_autoconfig
 
 
 class Ham10000DatasetAnalyzer:
-    '''
-    akiec: 327
-    bcc: 514
-    bkl: 1099
-    df: 115
-    nv: 6705
-    mel: 1113
-    vasc: 142
-
-    total: 10015
-    '''
 
     def __init__(self):
         self.path = None
@@ -54,13 +44,10 @@ class Ham10000DatasetAnalyzer:
                 f'\tclasse: "{class_name}"; num of images: {class_count};{(100.0 * class_count / self.num_of_images): .2f} % of the dataset.')
         print('------------------------')
 
-        self.save_dataframe(title)
+        # self.save_dataframe(title)
 
     def save_dataframe(self, title):
-        dataframe_path_lnx = '/home/albert/UOC-TFM/dataframes/'
-        dataframe_path_win = 'C:/albert/UOC/dataframes/'
-        dataframe_path_clb = '/content/drive/MyDrive/UOC-TFM/dataframes/'
-        dataframe_path = dataframe_path_win
+        dataframe_path = ham10000_autoconfig.get_dataframe_path()
 
         timestamp = time.strftime("%Y%m%d%H%M%S")
         filename = dataframe_path + timestamp + '_' + title + ".csv"
@@ -80,13 +67,10 @@ class Ham10000DatasetAnalyzer:
 
         print(f'Saved {filename}')
 
-if __name__ == '__main__':
-    path_lnx = '/home/albert/UOC-TFM/dataset/HAM10000_metadata'
-    path_win = 'C:/albert/UOC/dataset/HAM10000_metadata'
-    path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/HAM10000_metadata'
 
+if __name__ == '__main__':
     analyzer = Ham10000DatasetAnalyzer()
-    analyzer.analyze_path(path_win)
+    analyzer.analyze_path(ham10000_autoconfig.get_metadata_path())
     num_of_images, dataset_classes, dataset_classes_counts = analyzer.metadata()
 
     print(f'num of images: {num_of_images}')

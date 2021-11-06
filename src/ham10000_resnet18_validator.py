@@ -4,6 +4,8 @@
 import matplotlib.pyplot as plt
 import sklearn.metrics
 import torch.optim
+from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import PrecisionRecallDisplay
 
 
 # from sklearn.metrics import
@@ -83,6 +85,8 @@ class Ham10000ResNet18Validator:
         self.handmade_metrics.class_names = self.class_names
         all_predicted = []
         all_truth = []
+        all_predicted_tuples = []
+        all_ground_truth_tuples = []
 
         for i, images in enumerate(self.validation_dataloader, 0):
             inputs = images['image']
@@ -91,9 +95,19 @@ class Ham10000ResNet18Validator:
             with torch.no_grad():
                 outputs = self.model(inputs)
 
-                _, predicted = torch.max(outputs.data, 1)
+                predicted = outputs.data[:,:7] # Aquesta és la clau per a calcular l'mAP:
+                                               # Les 7 primeres columnes són els scores.
+                for pred_row in predicted:
+                    normalized_pred_row = torch.softmax(pred_row, dim=0)
+                    all_predicted_tuples.append(normalized_pred_row)
 
-                np_predicted = predicted.numpy()
+                _, predicted_label = torch.max(outputs.data, 1)
+                for index_label in predicted_label:
+                    ground_truth = [0, 0, 0, 0, 0, 0, 0]
+                    ground_truth[index_label] = 1
+                    all_ground_truth_tuples.append(ground_truth)
+
+                np_predicted = predicted_label.numpy()
                 np_label = labels.numpy()
                 num_elements = len(np_predicted)
 
@@ -104,6 +118,13 @@ class Ham10000ResNet18Validator:
                     all_truth.append(ground_truth_class)
 
                     self.handmade_metrics.update(predicted_class, ground_truth_class)
+
+        # TODO
+        # en aquest punt tinc un tensor de prediccions amb files de 7 elements amb scores normalitzats entre 0 i 1
+        # i un tensor de ground truth amb files de 7 zeros excepte la classe correcta, amb 1.
+        # ara ja puc tractar cada classe per separat (he de separar cada classe dels tensors esmentats)
+        # en principi ja no crec que calgui més preparació per aplicar sklearn.metrics i obtenir precision-recall-curve, average-precision ...
+        # to i que per plotejar, potser em caldrà reordenar els tensors de cada classe per score decreixent.
 
         self.show_metrics(all_truth, all_predicted)
 
