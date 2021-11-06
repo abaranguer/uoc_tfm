@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
+import ham10000_autoconfig
 from ham10000_dataset_loader import Ham10000Dataset
 from ham10000_dx_decoder import int_to_dx
 
@@ -33,21 +34,13 @@ if __name__ == '__main__':
     print('Start')
 
     # lesion_id,image_id,dx,dx_type,age,sex,localization,dataset
-    metadata_path_lnx = '/home/albert/UOC-TFM/dataset/HAM10000_metadata'
-    metadata_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000'
-    metadata_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/HAM10000_metadata'
-
-    metadata_path = metadata_path_win
+    metadata_path = ham10000_autoconfig.get_metadata_path()
     df = pandas.read_csv(metadata_path)
     np.random.seed(0)  # set random seed, so I obtain a deterministic sequence of random numbers.
     train_set, aux_set = train_test_split(df, test_size=0.30)  # 70% 30%
     validation_set, test_set = train_test_split(aux_set, test_size=0.50)  # 15%, 15%
 
-    images_path_lnx = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/300x225/'
-    images_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/300x225/'
-    images_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/dataset_ham_10000/ham10000/300x225/'
-
-    image_folder = images_path_win
+    image_folder = ham10000_autoconfig.get_images_path()
 
     # TODO: Utilitzar la mitjana i la desviació típica dels canals RGB de les imatges de ham10000
     train_data_transform = transforms.Compose([

@@ -10,6 +10,8 @@ from torch.optim import SGD
 import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
+import ham10000_autoconfig
+
 
 class Ham10000ResNet18Trainer:
 
@@ -35,7 +37,7 @@ class Ham10000ResNet18Trainer:
         for current_dx in dx:
             self.num_total += 1
 
-            if (self.num_total % 1000 ) == 0:
+            if (self.num_total % 1000) == 0:
                 print(f'Current : {self.num_total}')
 
             if current_dx == 'akiec':
@@ -56,14 +58,13 @@ class Ham10000ResNet18Trainer:
     def show_counters(self):
         print(f'total num of images: {self.num_total}')
         print('Number o samples per class:')
-        print(f'\takiec: {self.num_akiec}  ({100.0 * self.num_akiec/self.num_total:.2f} %)')
-        print(f'\t  bcc: {self.num_bcc}  ({100.0 * self.num_bcc/self.num_total:.2f} %)')
-        print(f'\t  bkl: {self.num_bkl}  ({100.0 * self.num_bkl/self.num_total:.2f} %)')
-        print(f'\t   df: {self.num_df}  ({100.0 * self.num_df/self.num_total:.2f} %)')
-        print(f'\t  mel: {self.num_mel}  ({100.0 * self.num_mel/self.num_total:.2f} %)')
-        print(f'\t   nv: {self.num_nv}  ({100.0 * self.num_nv/self.num_total:.2f} %)')
-        print(f'\t vasc: {self.num_vasc}  ({100.0 * self.num_vasc/self.num_total:.2f} %)')
-
+        print(f'\takiec: {self.num_akiec}  ({100.0 * self.num_akiec / self.num_total:.2f} %)')
+        print(f'\t  bcc: {self.num_bcc}  ({100.0 * self.num_bcc / self.num_total:.2f} %)')
+        print(f'\t  bkl: {self.num_bkl}  ({100.0 * self.num_bkl / self.num_total:.2f} %)')
+        print(f'\t   df: {self.num_df}  ({100.0 * self.num_df / self.num_total:.2f} %)')
+        print(f'\t  mel: {self.num_mel}  ({100.0 * self.num_mel / self.num_total:.2f} %)')
+        print(f'\t   nv: {self.num_nv}  ({100.0 * self.num_nv / self.num_total:.2f} %)')
+        print(f'\t vasc: {self.num_vasc}  ({100.0 * self.num_vasc / self.num_total:.2f} %)')
 
     def run_training(self, writer):
         self.loss = CrossEntropyLoss()
@@ -111,19 +112,29 @@ class Ham10000ResNet18Trainer:
         print('Finished Training')
         writer.flush()
 
-        resnet18_parameters_path_lnx = 'C:/albert/UOC/resnet18_parameters/'
-        resnet18_parameters_path_clb = 'C:/albert/UOC/resnet18_parameters/'
-        resnet18_parameters_path_win = 'C:/albert/UOC/resnet18_parameters/'
-
-        resnet18_parameters_path = resnet18_parameters_path_win
+        resnet18_parameters_path = ham10000_autoconfig.get_resnet18_parameters_path()
         timestamp = time.strftime("%Y%m%d%H%M%S")
         trained_model_filename = resnet18_parameters_path + timestamp + '_ham10000_trained_model.pth'
         torch.save(self.model.state_dict(), trained_model_filename)
-        
-
 
     def display_batch(self, images_batch, writer):
         grid_img = torchvision.utils.make_grid(images_batch, nrow=10)
+        '''
+        how to unnormalize images:
+        from https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821/20
+
+        mean = torch.tensor([0.4915, 0.4823, 0.4468])
+        std = torch.tensor([0.2470, 0.2435, 0.2616])
+
+        normalize = transforms.Normalize(mean.tolist(), std.tolist())
+        unnormalize = transforms.Normalize((-mean / std).tolist(), (1.0 / std).tolist())
+        unnormalized_grid_image = unnormalize(grid_img)
+
+        plt.imshow(unnormalized_grid_image.permute(1, 2, 0))
+        self.matplotlib_imshow(unnormalized_grid_image)
+        writer.add_image('Current image batch (unnormalized)',
+                         unnormalized_grid_image)
+        '''
         self.matplotlib_imshow(grid_img)
         writer.add_image('Current image batch (normalized)', grid_img)
 

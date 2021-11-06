@@ -1,8 +1,10 @@
 # /usr/bin/env python3.9
 # -*- coding: utf-8 -*-
 
-import pandas
 import time
+
+import pandas
+
 import ham10000_autoconfig
 
 

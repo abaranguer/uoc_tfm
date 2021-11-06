@@ -1,5 +1,5 @@
-import torchvision.models as models
 import torch
+import torchvision.models as models
 
 
 def freeze_layer(module):
@@ -14,12 +14,13 @@ def freeze_bn(module):
                            torch.nn.BatchNorm3d)):
         module.eval()
 
+
 class Model(torch.nn.Module):
     def __init__(self, num_layers):
         super(Model, self).__init__()
 
-        self.backbone =  models.resnet18()
-        mapper = {1:64, 2:128, 3:256, 4:512}
+        self.backbone = models.resnet18()
+        mapper = {1: 64, 2: 128, 3: 256, 4: 512}
         self.classifier = torch.nn.Linear(mapper[num_layers], 7)
         self.num_layers = num_layers
 
@@ -47,11 +48,12 @@ class Model(torch.nn.Module):
         for i in range(1, self.num_layers + 1):
             x = self.backbone.__getattr__(f"layer{i}")(x)
 
-        # x = self.backbone.avgpool(x)    # Original .
-        x = self.maxpool2d_test(x)        # Output més petit.  shape = (100, 128, 5, 7)
+        # x = self.backbone.avgpool(x)    # Original . average global pool  <-- ojo
+        x = self.maxpool2d_test(x)  # Output més petit.  shape = (100, 128, 5, 7)
 
-        x = torch.flatten(x, 1)   # (<class 'RuntimeError'>, RuntimeError('mat1 and mat2 shapes cannot be multiplied (100x4480 and 128x7)'),
-                                  # <traceback object at 0x0000016230FD4480>)
+        x = torch.flatten(x,
+                          1)  # (<class 'RuntimeError'>, RuntimeError('mat1 and mat2 shapes cannot be multiplied (100x4480 and 128x7)'),
+        # <traceback object at 0x0000016230FD4480>)
         '''
         def linear(input: Tensor, weight: Tensor, bias: Optional[Tensor] = None) -> Tensor:
             r"""
@@ -75,4 +77,3 @@ class Model(torch.nn.Module):
         x = self.classifier(x)
 
         return x
-

@@ -6,9 +6,9 @@ import time
 import torch
 import torchvision.models as models
 
+import ham10000_autoconfig
 from ham10000_dataset_splitter import Ham10000DatasetSplitter
 from ham10000_resnet18_validator import Ham10000ResNet18Validator
-import ham10000_autoconfig
 
 
 def log_time(message):

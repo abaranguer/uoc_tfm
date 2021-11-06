@@ -4,8 +4,6 @@
 import matplotlib.pyplot as plt
 import sklearn.metrics
 import torch.optim
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import PrecisionRecallDisplay
 
 
 # from sklearn.metrics import

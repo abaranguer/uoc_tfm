@@ -1,8 +1,9 @@
-from PIL import Image
 import statistics
+import time
 from os import listdir
 from os.path import isfile, join
-import time
+
+from PIL import Image
 
 
 def log_time(message):

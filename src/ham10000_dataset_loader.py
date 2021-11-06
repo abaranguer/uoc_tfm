@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
+import ham10000_autoconfig
 from ham10000_dx_decoder import dx_to_description
 from ham10000_dx_decoder import dx_to_int
 
@@ -62,17 +63,11 @@ def imshow(inp, title=None):
 
 if __name__ == '__main__':
     # lesion_id,image_id,dx,dx_type,age,sex,localization,dataset
-    metadata_path_lnx = '/home/albert/UOC-TFM/dataset/HAM10000_metadata'
-    metadata_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000'
-    metadata_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/HAM10000_metadata'
-    images_path_lnx = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/300x225/'
-    images_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/300x225'
-    images_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/dataset_ham_10000/ham10000/300x225/'
-
-    df = pandas.read_csv(metadata_path_win)
+    metadata_path = ham10000_autoconfig.get_metadata_path()
+    df = pandas.read_csv(metadata_path)
     train_set, test_set = train_test_split(df, test_size=0.25)
 
-    image_folder = images_path_win
+    image_folder = ham10000_autoconfig.get_images_path()
 
     train_data_transform = transforms.Compose([
         transforms.ToTensor(),

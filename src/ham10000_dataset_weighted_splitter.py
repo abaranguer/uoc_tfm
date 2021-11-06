@@ -3,7 +3,6 @@
 
 import numpy as np
 import pandas
-import torch
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from torch.utils.data import WeightedRandomSampler
@@ -88,31 +87,31 @@ class Ham10000DatasetWeightedSplitter:
         )
 
     def weighted_sampler_factory(self, unbalanced_dataset):
-        classes, num_images_per_class = np.unique(unbalanced_dataset.labels[:,1], return_counts=True)
+        classes, num_images_per_class = np.unique(unbalanced_dataset.labels[:, 1], return_counts=True)
         count_dict = dict(zip(classes, num_images_per_class))
         num_images_dataset = int(sum(num_images_per_class))
 
         class_weights_as_array = [(1 - (num_images / num_images_dataset)) for num_images in num_images_per_class]
-        #class_weights = torch.tensor(class_weights_as_array,
+        # class_weights = torch.tensor(class_weights_as_array,
         #                             dtype=torch.float)
 
-        # classe: "akiec"; num of images: 51; 3.40 % of the dataset.
-        # classe: "bcc"; num of images: 63; 4.19 % of the dataset.
-        # classe: "bkl"; num of images: 168; 11.19 % of the dataset.
-        # classe: "df"; num of images: 20; 1.33 % of the dataset.
-        # classe: "mel"; num of images: 187; 12.45 % of the dataset.
-        # classe: "nv"; num of images: 993; 66.11 % of the dataset.
-        # classe: "vasc"; num of images: 20; 1.33 % of the dataset.
+        # class: "akiec"; num of images: 51; 3.40 % of the dataset.
+        # class: "bcc"; num of images: 63; 4.19 % of the dataset.
+        # class: "bkl"; num of images: 168; 11.19 % of the dataset.
+        # class: "df"; num of images: 20; 1.33 % of the dataset.
+        # class: "mel"; num of images: 187; 12.45 % of the dataset.
+        # class: "nv"; num of images: 993; 66.11 % of the dataset.
+        # class: "vasc"; num of images: 20; 1.33 % of the dataset.
 
-        #class_weights = torch.tensor([1./0.0340, 1./0.0419, 1./0.1119, 1./0.0133, 1./0.1245, 1./0.6611, 1./0.0133],
+        # class_weights = torch.tensor([1./0.0340, 1./0.0419, 1./0.1119, 1./0.0133, 1./0.1245, 1./0.6611, 1./0.0133],
         #                             dtype=torch.float)
 
         # ['akiec', 'bcc', 'bkl', 'df', 'mel' ,'nv', 'vasc']
-        class_weights = [1./51., 1./63., 1./168., 1./20., 1./187., 1./933., 1./20.]
+        class_weights = [1. / 51., 1. / 63., 1. / 168., 1. / 20., 1. / 187., 1. / 933., 1. / 20.]
         sample_weights = [0] * num_images_dataset
 
         index_dx = 0
-        for current_dx in  unbalanced_dataset.labels[:,1]:
+        for current_dx in unbalanced_dataset.labels[:, 1]:
             if current_dx == 'akiec':
                 sample_weights[index_dx] = class_weights[0]
             elif current_dx == 'bcc':

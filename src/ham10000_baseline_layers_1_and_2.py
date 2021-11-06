@@ -3,15 +3,14 @@
 
 import time
 
-from model import Model
-
-import torchvision.models as models
 from torch.utils.tensorboard import SummaryWriter
 
+import ham10000_autoconfig
 from ham10000_dataset_splitter import Ham10000DatasetSplitter
 from ham10000_resnet18_predictor import Ham10000ResNet18Predictor
 from ham10000_resnet18_trainer import Ham10000ResNet18Trainer
 from ham10000_resnet18_validator import Ham10000ResNet18Validator
+from model import Model
 
 
 def log_time(message):
@@ -20,18 +19,11 @@ def log_time(message):
 
 
 if __name__ == '__main__':
-    metadata_path_lnx = '/home/albert/UOC-TFM/dataset/HAM10000_metadata'
-    metadata_path_win = 'C:/albert/UOC/dataset/HAM10000_metadata'
-    metadata_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/HAM10000_metadata'
-    images_path_lnx = '/home/albert/UOC-TFM/dataset/dataset ham_10000/ham10000/120x90/'
-    images_path_win = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/120x90/'
-    images_path_clb = '/content/drive/MyDrive/UOC-TFM/dataset/dataset_ham_10000/ham10000/120x90/'
-
     log_time('Start time:')
 
     print('1 . Splits training, validation and test sets')
-    metadata_path = metadata_path_win
-    images_path = images_path_win
+    metadata_path = ham10000_autoconfig.get_metadata_path()
+    images_path = ham10000_autoconfig.get_images_path()
     splitter = Ham10000DatasetSplitter(metadata_path, images_path, percent_val=0.15, percent_test=0.15)
     train_dataloader = splitter.train_dataloader
     validation_dataloader = splitter.validation_dataloader
@@ -68,11 +60,8 @@ if __name__ == '__main__':
     trainer = Ham10000ResNet18Trainer(train_dataloader, model_2_layers, epochs=5)
 
     log_time('\tTraining start time:')
-    tensorboard_logs_lnx = '/home/albert/UOC-TFM/tensorboard-logs'
-    tensorboard_logs_win = 'C:/albert/UOC/tensorboard-logs'
-    tensorboard_logs_clb = '/content/drive/MyDrive/UOC-TFM/tensorboard-logs'
-
-    writer = SummaryWriter(log_dir=tensorboard_logs_win)
+    tensorboard_logs_path = ham10000_autoconfig.get_tensorboard_logs_path()
+    writer = SummaryWriter(log_dir=tensorboard_logs_path)
     trainer.run_training(writer)
 
     log_time('\tTraining end time:')
