@@ -43,7 +43,7 @@ class Ham10000DatasetAnalyzer:
             class_name = self.dataset_classes_counts.index[dataset_classe_count[0]]
             class_count = dataset_classe_count[1]
             print(
-                f'\tclasse: "{class_name}"; num of images: {class_count};{(100.0 * class_count / self.num_of_images): .2f} % of the dataset.')
+                f'\tclass: "{class_name}"; num of images: {class_count};{(100.0 * class_count / self.num_of_images): .2f} % of the dataset.')
         print('------------------------')
 
         # self.save_dataframe(title)
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     print(f'num of classes: {dataset_classes}')
     for dataset_classe_count in enumerate(dataset_classes_counts):
         print(
-            f'\tclasse: "{dataset_classes[dataset_classe_count[0]]}"; num of images: {dataset_classe_count[1]};{(100.0 * dataset_classe_count[1] / num_of_images): .2f} % of the dataset.')
+            f'\tclass: "{dataset_classes[dataset_classe_count[0]]}"; num of images: {dataset_classe_count[1]};{(100.0 * dataset_classe_count[1] / num_of_images): .2f} % of the dataset.')
 
     print('\n\nUsing "analyzer.show" method:\n')
     analyzer.show('Test on HAM10000_METADATA')
