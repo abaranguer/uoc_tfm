@@ -1,6 +1,6 @@
 import torch
 import torchvision.models as models
-
+from torch.nn import AdaptiveMaxPool2d
 
 def freeze_layer(module):
     for name, param in module.named_parameters():
@@ -24,7 +24,7 @@ class Model(torch.nn.Module):
         self.classifier = torch.nn.Linear(mapper[num_layers], 7)
         self.num_layers = num_layers
 
-        self.maxpool2d_test = torch.nn.MaxPool2d(3, stride=2)
+        self.maxpool2d_test = torch.nn.AdaptiveMaxPool2d(1)
 
         for x in range(num_layers + 1, 5):
             self.backbone.__delattr__(f"layer{x}")
@@ -51,9 +51,8 @@ class Model(torch.nn.Module):
         # x = self.backbone.avgpool(x)    # Original . average global pool  <-- ojo
         x = self.maxpool2d_test(x)  # Output més petit.  shape = (100, 128, 5, 7)
 
-        x = torch.flatten(x,
-                          1)  # (<class 'RuntimeError'>, RuntimeError('mat1 and mat2 shapes cannot be multiplied (100x4480 and 128x7)'),
-        # <traceback object at 0x0000016230FD4480>)
+        x = torch.flatten(x, 1)
+
         '''
         def linear(input: Tensor, weight: Tensor, bias: Optional[Tensor] = None) -> Tensor:
             r"""

@@ -46,8 +46,9 @@ class Ham10000DatasetWeightedSplitter:
 
         self.data_transform = transforms.Compose([
             transforms.ToTensor(),
-            # TODO: Utilitzar la mitjana i la desviació típica dels canals RGB de les imatges de ham10000
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            # Estic utilitzant la mitjana i la desviació típica dels canals RGB de les imatges de ham10000 300x225
+            # Valors ImageNET: transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            transforms.Normalize([0.764, 0.547, 0.571], [0.141, 0.152, 0.169])
         ])
 
         '''
@@ -107,7 +108,9 @@ class Ham10000DatasetWeightedSplitter:
         #                             dtype=torch.float)
 
         # ['akiec', 'bcc', 'bkl', 'df', 'mel' ,'nv', 'vasc']
-        class_weights = [1. / 51., 1. / 63., 1. / 168., 1. / 20., 1. / 187., 1. / 933., 1. / 20.]
+        # class_weights = [1. / 51., 1. / 63., 1. / 168., 1. / 20., 1. / 187., 1. / 933., 1. / 20.]
+        class_weights = [1502. / 51., 1502. / 63., 1502. / 168., 1502. / 20., 1502. / 187., 1502. / 933., 1502. / 20.]
+
         sample_weights = [0] * num_images_dataset
 
         index_dx = 0
