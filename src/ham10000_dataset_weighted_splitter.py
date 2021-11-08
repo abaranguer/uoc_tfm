@@ -92,24 +92,24 @@ class Ham10000DatasetWeightedSplitter:
         count_dict = dict(zip(classes, num_images_per_class))
         num_images_dataset = int(sum(num_images_per_class))
 
-        class_weights_as_array = [(1 - (num_images / num_images_dataset)) for num_images in num_images_per_class]
-        # class_weights = torch.tensor(class_weights_as_array,
-        #                             dtype=torch.float)
-
-        # class: "akiec"; num of images: 51; 3.40 % of the dataset.
-        # class: "bcc"; num of images: 63; 4.19 % of the dataset.
-        # class: "bkl"; num of images: 168; 11.19 % of the dataset.
-        # class: "df"; num of images: 20; 1.33 % of the dataset.
-        # class: "mel"; num of images: 187; 12.45 % of the dataset.
-        # class: "nv"; num of images: 993; 66.11 % of the dataset.
-        # class: "vasc"; num of images: 20; 1.33 % of the dataset.
-
-        # class_weights = torch.tensor([1./0.0340, 1./0.0419, 1./0.1119, 1./0.0133, 1./0.1245, 1./0.6611, 1./0.0133],
-        #                             dtype=torch.float)
-
         # ['akiec', 'bcc', 'bkl', 'df', 'mel' ,'nv', 'vasc']
-        # class_weights = [1. / 51., 1. / 63., 1. / 168., 1. / 20., 1. / 187., 1. / 933., 1. / 20.]
-        class_weights = [1502. / 51., 1502. / 63., 1502. / 168., 1502. / 20., 1502. / 187., 1502. / 933., 1502. / 20.]
+        # how to calculate the class weights
+        # https://www.analyticsvidhya.com/blog/2020/10/improve-class-imbalance-class-weights/
+        #
+        # Wi = NI / (NC * NSi)
+        # Wi = Weight of class i
+        # NI = number of images (7010)
+        # NC = number of classes (7)
+        # NSi = number of images of class i
+        # NS0 = number of samples of class "akiec" (231).
+        # NS1 = number of samples of class "bcc"   (371)
+        # NS2 = number of samples of class "bkl"   (749)
+        # NS3 = number of samples of class "df"     (76)
+        # NS4 = number of samples of class "mel"   (766)
+        # NS5 = number of samples of class "nv"   (4709)
+        # NS6 = number of samples of class "vasc"  (109)
+        NC = 7.0
+        class_weights = num_images_dataset / (NC * num_images_per_class)
 
         sample_weights = [0] * num_images_dataset
 
