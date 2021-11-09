@@ -10,6 +10,10 @@ from torchvision import transforms
 
 from ham10000_analyzer import Ham10000DatasetAnalyzer
 from ham10000_dataset_loader import Ham10000Dataset
+from ham10000_albumentation_dataset_loader import Ham10000AlbumentationDataset
+
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 
 
 class Ham10000DatasetWeightedSplitter:
@@ -44,25 +48,71 @@ class Ham10000DatasetWeightedSplitter:
         self.analyzer.analyze_dataframe(self.test_set)
         self.analyzer.show('TEST SET')
 
+        # data augmentation
+        # pip install -U albumentations
+        # https://albumentations.ai/
+        # @Article{info11020125,
+        #     AUTHOR = {Buslaev, Alexander and Iglovikov, Vladimir I. and Khvedchenya, Eugene and Parinov, Alex and Druzhinin, Mikhail and Kalinin, Alexandr A.},
+        #     TITLE = {Albumentations: Fast and Flexible Image Augmentations},
+        #     JOURNAL = {Information},
+        #     VOLUME = {11},
+        #     YEAR = {2020},
+        #     NUMBER = {2},
+        #     ARTICLE-NUMBER = {125},
+        #     URL = {https://www.mdpi.com/2078-2489/11/2/125},
+        #     ISSN = {2078-2489},
+        #     DOI = {10.3390/info11020125}
+        # }
+        #
+        # https://albumentations.ai/docs/examples/pytorch_classification/
+        # Be cautious when using data augemtation! Read
+        # https://towardsdatascience.com/data-augmentation-in-medical-images-95c774e6eaae
+        # Data Augmentation in Medical Images
+        # How to improve vision model performance by reshaping and resampling data
+        # Cody Glickman, PhD  Oct 12, 2020. (last seen in Nov. 10th, 2021).
+        # "When performing any type of data augmentation, it is important to keep in mind
+        # the output of your model and if augmentation would affect the resulting classification.
+        # For example, in X-ray data the heart is typically on the right of the image, however
+        # the image below shows a horizontal flip augmentation inadvertently creates a medical
+        # condition call situs inversus."
+
+        # Estic utilitzant la mitjana i la desviació típica dels canals RGB de les imatges de ham10000 300x225
+        # Valors ImageNET: transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+
+        self.albumentation_transforms = A.Compose([
+            A.OneOf([
+                A.HorizontalFlip(),
+                A.VerticalFlip(),
+                A.Rotate(),
+                A.GaussNoise(),
+            ], p=0.5),
+            A.Normalize(
+                mean=[0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
+                std=[0.141, 0.152, 0.169]),  # std. dev. of RGB channels of HAM10000 dataset
+            ToTensorV2()
+            ], p=1
+        )
+
         self.data_transform = transforms.Compose([
             transforms.ToTensor(),
-            # Estic utilitzant la mitjana i la desviació típica dels canals RGB de les imatges de ham10000 300x225
-            # Valors ImageNET: transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-            transforms.Normalize([0.764, 0.547, 0.571], [0.141, 0.152, 0.169])
+            transforms.Normalize(
+                [0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
+                [0.141, 0.152, 0.169])  # std. dev. of RGB channels of HAM10000 dataset
         ])
 
         '''
-        '# training data
         train_data_transform = transforms.Compose([
             transforms.Resize(224),
             transforms.RandomHorizontalFlip(),
             transforms.RandomVerticalFlip(),
             transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            transforms.Normalize(
+                [0.485, 0.456, 0.406],  # mean of RGB channels of ImageNet dataset 
+                [0.229, 0.224, 0.225])  # std. dev. of RGB channels of ImageNet dataset
         ])
         '''
 
-        self.train_dataset = Ham10000Dataset(self.train_set, dataset_images_path, self.data_transform)
+        self.train_dataset = Ham10000AlbumentationDataset(self.train_set, dataset_images_path, self.albumentation_transforms)
         self.validation_dataset = Ham10000Dataset(self.validation_set, dataset_images_path, self.data_transform)
         self.test_dataset = Ham10000Dataset(self.test_set, dataset_images_path, self.data_transform)
 
@@ -88,26 +138,25 @@ class Ham10000DatasetWeightedSplitter:
         )
 
     def weighted_sampler_factory(self, unbalanced_dataset):
-        classes, num_images_per_class = np.unique(unbalanced_dataset.labels[:, 1], return_counts=True)
-        count_dict = dict(zip(classes, num_images_per_class))
+        _, num_images_per_class = np.unique(unbalanced_dataset.labels[:, 1], return_counts=True)
         num_images_dataset = int(sum(num_images_per_class))
 
-        # ['akiec', 'bcc', 'bkl', 'df', 'mel' ,'nv', 'vasc']
         # how to calculate the class weights
-        # https://www.analyticsvidhya.com/blog/2020/10/improve-class-imbalance-class-weights/
-        #
-        # Wi = NI / (NC * NSi)
-        # Wi = Weight of class i
-        # NI = number of images (7010)
-        # NC = number of classes (7)
-        # NSi = number of images of class i
-        # NS0 = number of samples of class "akiec" (231).
-        # NS1 = number of samples of class "bcc"   (371)
-        # NS2 = number of samples of class "bkl"   (749)
-        # NS3 = number of samples of class "df"     (76)
-        # NS4 = number of samples of class "mel"   (766)
-        # NS5 = number of samples of class "nv"   (4709)
-        # NS6 = number of samples of class "vasc"  (109)
+        # let
+        #   Wi = Weight of class i
+        #   NI = number of images (7010)
+        #   NO = number of images in sample set (i.e. 10515 = 1010 * 1.5)
+        #   NC = number of classes (7)
+        #   NSi = number of images of class i
+        #   NS0 = number of samples of class "akiec" (231).
+        #   NS1 = number of samples of class "bcc"   (371)
+        #   ...
+        #   NOi = number of images of class i in sample set ( aprox. 1502 = NO / NC )
+        #   Wi  = "weight" or "intensity" of sampling in class i
+        # then
+        #   NSi * Wi = NO / NC
+        # it implies
+        #   Wi = NO / (NC * NSi)
         NC = 7.0
         class_weights = num_images_dataset / (NC * num_images_per_class)
 
