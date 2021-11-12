@@ -29,7 +29,8 @@ if __name__ == '__main__':
     print('2 - Load ResNet18 model')
     model = models.resnet18()
     resnet18_parameters_path = ham10000_autoconfig.get_resnet18_parameters_path()
-    resnet18_parameters_filename = '20211102005954_ham10000_trained_model.pth' # (weighted)
+    resnet18_parameters_filename = '20211110212929_ham10000_trained_model.pth' \
+    # resnet18_parameters_filename = '20211102005954_ham10000_trained_model.pth' # (weighted)
     # resnet18_parameters_filename = '20211030161151_ham10000_trained_model.pth' # (baseline - no weighted)
     resnet18_parameters = resnet18_parameters_path + resnet18_parameters_filename
     model.load_state_dict(torch.load(resnet18_parameters))

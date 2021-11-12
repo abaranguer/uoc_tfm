@@ -113,13 +113,13 @@ class Ham10000ResNet18Validator:
             with torch.no_grad():
                 outputs = self.model(inputs)
                 _, predicted_label = torch.max(outputs.data, 1)
-                self.precalculate_metrics(outputs, predicted_label)
+                self.precalculate_metrics(outputs, predicted_label, labels)
                 self.calculate_handmade_metrics(predicted_label, labels)
 
         self.show_mAP()
         self.show_metrics()
 
-    def precalculate_metrics(self, outputs, predicted_label):
+    def precalculate_metrics(self, outputs, predicted_label, labels):
         predicted = outputs.data[:, :7]
 
         ix_akiec = self.class_names.index('akiec')
@@ -143,7 +143,7 @@ class Ham10000ResNet18Validator:
             self.all_predicted_scores_nv.append(float(normalized_pred_row[ix_nv]))
             self.all_predicted_scores_vasc.append(float(normalized_pred_row[ix_vasc]))
 
-        for index_label in predicted_label:
+        for index_label in labels:
             ground_truth = [0, 0, 0, 0, 0, 0, 0]
             ground_truth[index_label] = 1
 
@@ -202,13 +202,13 @@ class Ham10000ResNet18Validator:
     def show_mAP(self):
         self.calculate_mAP_per_class()
         print('----------------------------------------------------')
-        print(f'mAP akiec:  {self.mAP_akiec: .2f}')
-        print(f'mAP bcc:    {self.mAP_bcc: .2f}')
-        print(f'mAP bkl:    {self.mAP_bkl: .2f}')
-        print(f'mAP df:     {self.mAP_df: .2f}')
-        print(f'mAP mel:    {self.mAP_mel: .2f}')
-        print(f'mAP nv:     {self.mAP_nv: .2f}')
-        print(f'mAP vasc:   {self.mAP_vasc: .2f}')
+        print(f'mAP akiec:  {self.mAP_akiec: .2f} sobre un total de {sum(self.all_ground_truth_akiec)}')
+        print(f'mAP bcc:    {self.mAP_bcc: .2f} sobre un total de {sum(self.all_ground_truth_bcc)}')
+        print(f'mAP bkl:    {self.mAP_bkl: .2f} sobre un total de {sum(self.all_ground_truth_bkl)}')
+        print(f'mAP df:     {self.mAP_df: .2f} sobre un total de {sum(self.all_ground_truth_df)}')
+        print(f'mAP mel:    {self.mAP_mel: .2f} sobre un total de {sum(self.all_ground_truth_mel)}')
+        print(f'mAP nv:     {self.mAP_nv: .2f} sobre un total de {sum(self.all_ground_truth_nv)}')
+        print(f'mAP vasc:   {self.mAP_vasc: .2f} sobre un total de {sum(self.all_ground_truth_vasc)}')
         print('\n')
         print(f'mAP micro:    {self.mAP_micro: .2f}')
         print(f'mAP macro:    {self.mAP_macro: .2f}')

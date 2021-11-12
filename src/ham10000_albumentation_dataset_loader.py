@@ -14,6 +14,7 @@ from torchvision import transforms
 import ham10000_autoconfig
 from ham10000_dx_decoder import dx_to_description
 from ham10000_dx_decoder import dx_to_int
+from ham10000_dataset_loader import Ham10000Dataset
 
 ''' 
 Albumentations:  
