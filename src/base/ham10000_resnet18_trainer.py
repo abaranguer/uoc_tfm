@@ -118,7 +118,7 @@ class Ham10000ResNet18Trainer:
         torch.save(self.model.state_dict(), trained_model_filename)
 
     def display_batch(self, images_batch, writer):
-        grid_img = torchvision.utils.make_grid(images_batch, nrow=10)
+        grid_img = torchvision.utils.make_grid(images_batch, nrow=10, normalize=True, scale_each=True)
         '''
         how to unnormalize images:
         from https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821/20

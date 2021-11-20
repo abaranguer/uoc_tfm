@@ -15,7 +15,6 @@ from ham10000_albumentation_dataset_loader import Ham10000AlbumentationDataset
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
 
-
 class Ham10000DatasetWeightedSplitter:
 
     def __init__(self, dataset_metadata_path, dataset_images_path,
@@ -80,18 +79,69 @@ class Ham10000DatasetWeightedSplitter:
         # Valors ImageNET: transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 
         self.albumentation_transforms = A.Compose([
+            # Random crops
+
+            # A.OneOf([
+            #     A.RandomCrop(height=180, width=240),
+            #     A.RandomResizedCrop(height=225, width=300, scale=0.8),
+            #     A.CenterCrop(height=135, width=180),
+            #     A.Crop(),
+            #     A.CropAndPad(percent=0.1),
+            #     A.NoOp()
+            # ], p=0.5),
+
+            # # Affine Transforms
+            # A.OneOf([
+            #     A.Affine(),
+            #     A.PiecewiseAffine(),
+            #     A.ElasticTransform(),
+            #     A.ShiftScaleRotate(),
+            #     A.Rotate(),
+            #     A.SafeRotate(),
+            #     A.RandomRotate90(),
+            #     A.RandomScale(),
+            #     A.NoOp()
+            # ], p=0.5),
+
+            # # Flips
             A.OneOf([
                 A.HorizontalFlip(),
                 A.VerticalFlip(),
-                A.Rotate(),
-                A.GaussNoise(),
+                A.Compose(
+                    [A.Transpose(p=1), A.Affine(rotate=[90, 90], p=1)]
+                ),
+                A.NoOp()
             ], p=0.5),
-            A.Normalize(
-                mean=[0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
-                std=[0.141, 0.152, 0.169]),  # std. dev. of RGB channels of HAM10000 dataset
+
+            # Saturation, contrast, brightness, and hue
+            A.OneOf([
+                A.CLAHE(),
+                A.ColorJitter(),
+                A.Equalize(),
+                A.HueSaturationValue(),
+                A.RandomBrightnessContrast(),
+                A.NoOp()
+            ], p=0.5),
+
+            # Normalize
+            A.Normalize(mean=[0.764, 0.547, 0.571], # mean of RGB channels of HAM10000 dataset
+                        std=[0.141, 0.152, 0.169], # std. dev. of RGB channels of HAM10000 dataset
+                        p=1),
+
             ToTensorV2()
-            ], p=1
+            ],
+
+            p=1
         )
+
+        '''
+        self.data_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(
+                [0.485, 0.456, 0.406],  # mean of RGB channels of ImageNET dataset
+                [0.229, 0.224, 0.225])  # std. dev. of RGB channels of ImageNET dataset
+        ])
+        '''
 
         self.data_transform = transforms.Compose([
             transforms.ToTensor(),
@@ -100,19 +150,8 @@ class Ham10000DatasetWeightedSplitter:
                 [0.141, 0.152, 0.169])  # std. dev. of RGB channels of HAM10000 dataset
         ])
 
-        '''
-        train_data_transform = transforms.Compose([
-            transforms.Resize(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                [0.485, 0.456, 0.406],  # mean of RGB channels of ImageNet dataset 
-                [0.229, 0.224, 0.225])  # std. dev. of RGB channels of ImageNet dataset
-        ])
-        '''
-
         self.train_dataset = Ham10000AlbumentationDataset(self.train_set, dataset_images_path, self.albumentation_transforms)
+        # self.train_dataset = Ham10000Dataset(self.train_set, dataset_images_path, self.data_transform)
         self.validation_dataset = Ham10000Dataset(self.validation_set, dataset_images_path, self.data_transform)
         self.test_dataset = Ham10000Dataset(self.test_set, dataset_images_path, self.data_transform)
 

@@ -1,6 +1,6 @@
 import torch
 import torchvision.models as models
-from torch.nn import AdaptiveMaxPool2d
+
 
 def freeze_layer(module):
     for name, param in module.named_parameters():
@@ -48,30 +48,9 @@ class Model(torch.nn.Module):
         for i in range(1, self.num_layers + 1):
             x = self.backbone.__getattr__(f"layer{i}")(x)
 
-        # x = self.backbone.avgpool(x)    # Original . average global pool  <-- ojo
-        x = self.maxpool2d_test(x)  # Output més petit.  shape = (100, 128, 5, 7)
+        x = self.maxpool2d_test(x)
 
         x = torch.flatten(x, 1)
-
-        '''
-        def linear(input: Tensor, weight: Tensor, bias: Optional[Tensor] = None) -> Tensor:
-            r"""
-            Applies a linear transformation to the incoming data: :math:`y = xA^T + b`.
-        
-            This operator supports :ref:`TensorFloat32<tf32_on_ampere>`.
-        
-            Shape:
-        
-                - Input: :math:`(N, *, in\_features)` N is the batch size, `*` means any number of
-                  additional dimensions
-                - Weight: :math:`(out\_features, in\_features)`
-                - Bias: :math:`(out\_features)`
-                - Output: :math:`(N, *, out\_features)`
-            """
-            if has_torch_function_variadic(input, weight, bias):
-                return handle_torch_function(linear, (input, weight, bias), input, weight, bias=bias)
-            return torch._C._nn.linear(input, weight, bias)     
-        '''
 
         x = self.classifier(x)
 
