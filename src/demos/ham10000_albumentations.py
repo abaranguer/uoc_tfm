@@ -30,25 +30,28 @@ albumentation_transforms = A.Compose([
 
     A.OneOf([
         #     A.RandomCrop(height=180, width=240),
-        A.RandomResizedCrop(height=225, width=300, scale=[0.3, 0.8], ratio=[3. / 4., 4. / 3.]),
+        A.RandomResizedCrop(height=225, width=300, scale=[0.2, 0.8], ratio=[3. / 4., 4. / 3.]),
         #     A.CenterCrop(height=135, width=180),
         #     A.Crop(),
-        A.CropAndPad(percent=0.1),
+        # A.CropAndPad(percent=0.1),
         A.NoOp()
     ], p=0.5),
 
-    # # Affine Transforms
-    # A.OneOf([
+    # Affine Transforms
+    A.OneOf([
     #     A.Affine(),
     #     A.PiecewiseAffine(),
-    #     A.ElasticTransform(),
+         A.ElasticTransform(),
     #     A.ShiftScaleRotate(),
-    #     A.Rotate(),
+        A.Compose([
+            A.Rotate(),
+            A.Resize(height=225, width=300)
+        ]) ,
     #     A.SafeRotate(),
     #     A.RandomRotate90(),
     #     A.RandomScale(),
     #     A.NoOp()
-    # ], p=0.5),
+    ], p=0.5),
 
     # # Flips
     A.OneOf([
@@ -60,15 +63,15 @@ albumentation_transforms = A.Compose([
         A.NoOp()
     ], p=0.5),
 
-    # Saturation, contrast, brightness, and hue
-    A.OneOf([
-        # A.CLAHE(),
-        A.ColorJitter(),
-        # A.Equalize(),
-        A.HueSaturationValue(),
-        A.RandomBrightnessContrast(),
-        A.NoOp()
-    ], p=0.8),
+    # # Saturation, contrast, brightness, and hue
+    # A.OneOf([
+    #     A.CLAHE(),
+    #     A.ColorJitter(),
+    #     A.Equalize(),
+    #     A.HueSaturationValue(),
+    #     A.RandomBrightnessContrast(),
+    #     A.NoOp()
+    # ], p=0.5),
 
     # Normalize
     A.Normalize(mean=[0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
@@ -80,7 +83,7 @@ albumentation_transforms = A.Compose([
 
 img_path = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/300x225/ISIC_0024306.jpg'
 image_pil_1 = PIL.Image.open(img_path).convert('RGB')
-image_np_1 = np.array(image_pil_1)
+image_np_1 = np.array(image_pil_1).astype(float)
 image_tensor_1 = torch.from_numpy(image_np_1)
 # plt.imshow(image_pil_1)
 # plt.show()
@@ -89,7 +92,7 @@ for i in range(99):
     augmented = albumentation_transforms(image=image_np_1)
     toPilImage = torchvision.transforms.ToPILImage()
     image_pil_2 = toPilImage(augmented['image']).convert('RGB')
-    image_np_2 = np.array(image_pil_2)
+    image_np_2 = np.array(image_pil_2).astype(float)
     image_tensor_2 = torch.from_numpy(image_np_2)
     # plt.imshow(image_pil_2)
     # plt.show()
@@ -98,6 +101,9 @@ for i in range(99):
 grid_tensor = torch.from_numpy(np.array(images))
 # (N, C, H, W)
 reordered_grid_tensor = torch.permute(grid_tensor, [0, 3, 1, 2])
-image_grid = torchvision.utils.make_grid(reordered_grid_tensor, nrow=10, scale_each=True, normalize=False )
+image_grid = torchvision.utils.make_grid(reordered_grid_tensor,
+                                         nrow=10,
+                                         normalize=True,
+                                         scale_each=True)
 plt.imshow(image_grid.permute(1, 2, 0))
 plt.show()

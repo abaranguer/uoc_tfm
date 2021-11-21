@@ -8,12 +8,13 @@ from torch.utils.data import DataLoader
 from torch.utils.data import WeightedRandomSampler
 from torchvision import transforms
 
-from ham10000_analyzer import Ham10000DatasetAnalyzer
-from ham10000_dataset_loader import Ham10000Dataset
-from ham10000_albumentation_dataset_loader import Ham10000AlbumentationDataset
+from src.exp4.ham10000_analyzer import Ham10000DatasetAnalyzer
+from src.exp4.ham10000_dataset_loader import Ham10000Dataset
+from src.exp4.ham10000_albumentation_dataset_loader import Ham10000AlbumentationDataset
 
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
+
 
 class Ham10000DatasetWeightedSplitter:
 
@@ -50,89 +51,65 @@ class Ham10000DatasetWeightedSplitter:
         # data augmentation
         # pip install -U albumentations
         # https://albumentations.ai/
-        # @Article{info11020125,
-        #     AUTHOR = {Buslaev, Alexander and Iglovikov, Vladimir I. and Khvedchenya, Eugene and Parinov, Alex and Druzhinin, Mikhail and Kalinin, Alexandr A.},
-        #     TITLE = {Albumentations: Fast and Flexible Image Augmentations},
-        #     JOURNAL = {Information},
-        #     VOLUME = {11},
-        #     YEAR = {2020},
-        #     NUMBER = {2},
-        #     ARTICLE-NUMBER = {125},
-        #     URL = {https://www.mdpi.com/2078-2489/11/2/125},
-        #     ISSN = {2078-2489},
-        #     DOI = {10.3390/info11020125}
-        # }
-        #
         # https://albumentations.ai/docs/examples/pytorch_classification/
         # Be cautious when using data augemtation! Read
         # https://towardsdatascience.com/data-augmentation-in-medical-images-95c774e6eaae
-        # Data Augmentation in Medical Images
-        # How to improve vision model performance by reshaping and resampling data
-        # Cody Glickman, PhD  Oct 12, 2020. (last seen in Nov. 10th, 2021).
-        # "When performing any type of data augmentation, it is important to keep in mind
-        # the output of your model and if augmentation would affect the resulting classification.
-        # For example, in X-ray data the heart is typically on the right of the image, however
-        # the image below shows a horizontal flip augmentation inadvertently creates a medical
-        # condition call situs inversus."
-
-        # Estic utilitzant la mitjana i la desviació típica dels canals RGB de les imatges de ham10000 300x225
-        # Valors ImageNET: transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 
         self.albumentation_transforms = A.Compose([
             # Random crops
 
-            # A.OneOf([
-            #     A.RandomCrop(height=180, width=240),
-            #     A.RandomResizedCrop(height=225, width=300, scale=0.8),
-            #     A.CenterCrop(height=135, width=180),
-            #     A.Crop(),
-            #     A.CropAndPad(percent=0.1),
-            #     A.NoOp()
-            # ], p=0.5),
+            A.OneOf([
+                #     A.RandomCrop(height=180, width=240),
+                A.RandomResizedCrop(height=225, width=300, scale=[0.2, 0.8], ratio=[3. / 4., 4. / 3.]),
+                #     A.CenterCrop(height=135, width=180),
+                #     A.Crop(),
+                # A.CropAndPad(percent=0.1),
+                A.NoOp()
+            ], p=0.5),
 
-            # # Affine Transforms
-            # A.OneOf([
-            #     A.Affine(),
-            #     A.PiecewiseAffine(),
-            #     A.ElasticTransform(),
-            #     A.ShiftScaleRotate(),
-            #     A.Rotate(),
-            #     A.SafeRotate(),
-            #     A.RandomRotate90(),
-            #     A.RandomScale(),
-            #     A.NoOp()
-            # ], p=0.5),
+            # Affine Transforms
+            A.OneOf([
+                #     A.Affine(),
+                #     A.PiecewiseAffine(),
+                A.ElasticTransform(),
+                #     A.ShiftScaleRotate(),
+                A.Compose([
+                    A.Rotate(),
+                    A.Resize(height=225, width=300)
+                ]),
+                #     A.SafeRotate(),
+                #     A.RandomRotate90(),
+                #     A.RandomScale(),
+                #     A.NoOp()
+            ], p=0.5),
 
             # # Flips
             A.OneOf([
                 A.HorizontalFlip(),
                 A.VerticalFlip(),
-                A.Compose(
-                    [A.Transpose(p=1), A.Affine(rotate=[90, 90], p=1)]
-                ),
+                # A.Compose(
+                #     [A.Transpose(p=1), A.Rotate(limit=[90, 90], p=1)]
+                # ),
                 A.NoOp()
             ], p=0.5),
 
-            # Saturation, contrast, brightness, and hue
-            A.OneOf([
-                A.CLAHE(),
-                A.ColorJitter(),
-                A.Equalize(),
-                A.HueSaturationValue(),
-                A.RandomBrightnessContrast(),
-                A.NoOp()
-            ], p=0.5),
+            # # Saturation, contrast, brightness, and hue
+            # A.OneOf([
+            #     A.CLAHE(),
+            #     A.ColorJitter(),
+            #     A.Equalize(),
+            #     A.HueSaturationValue(),
+            #     A.RandomBrightnessContrast(),
+            #     A.NoOp()
+            # ], p=0.5),
 
             # Normalize
-            A.Normalize(mean=[0.764, 0.547, 0.571], # mean of RGB channels of HAM10000 dataset
-                        std=[0.141, 0.152, 0.169], # std. dev. of RGB channels of HAM10000 dataset
+            A.Normalize(mean=[0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
+                        std=[0.141, 0.152, 0.169],  # std. dev. of RGB channels of HAM10000 dataset
                         p=1),
 
             ToTensorV2()
-            ],
-
-            p=1
-        )
+        ], p=1)
 
         '''
         self.data_transform = transforms.Compose([
@@ -183,19 +160,30 @@ class Ham10000DatasetWeightedSplitter:
         # how to calculate the class weights
         # let
         #   Wi = Weight of class i
-        #   NI = number of images (7010)
-        #   NO = number of images in sample set (i.e. 10515 = 1010 * 1.5)
-        #   NC = number of classes (7)
+        #   NI = number of images full set (10015)
+        #   NO = number of images in train set (7010)
+        #   NC = number of classes  (7)
         #   NSi = number of images of class i
-        #   NS0 = number of samples of class "akiec" (231).
-        #   NS1 = number of samples of class "bcc"   (371)
-        #   ...
-        #   NOi = number of images of class i in sample set ( aprox. 1502 = NO / NC )
-        #   Wi  = "weight" or "intensity" of sampling in class i
+        #     NS0 = number of samples of class "akiec"  (231)
+        #     NS1 = number of samples of class "bcc" (371)
+        #     NS2 = number of samples of class "bkl"  (749)
+        #     NS3 = number of samples of class "df" (76)
+        #     NS4 = number of samples of class "mel" (766)
+        #     NS5 = number of samples of class "nv"  (4708)
+        #     NS6 = number of samples of class "vasc" (109)
+        #   NOi = number of images of class i in train  set
+        #   Wi  = "weight" or "intensity" of sampling train set for class i
         # then
         #   NSi * Wi = NO / NC
         # it implies
         #   Wi = NO / (NC * NSi)
+        #     W0 = 4.36
+        #     W1 = 2.7
+        #     W2 = 1.34
+        #     W3 = 13.18
+        #     W4 = 1.31
+        #     W5 = 0.21
+        #     W6 = 9.19
         NC = 7.0
         class_weights = num_images_dataset / (NC * num_images_per_class)
 

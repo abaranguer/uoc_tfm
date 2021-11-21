@@ -10,7 +10,7 @@ from torch.optim import SGD
 import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
-import ham10000_autoconfig
+import src.exp4.ham10000_autoconfig
 
 
 class Ham10000ResNet18Trainer:
@@ -112,29 +112,13 @@ class Ham10000ResNet18Trainer:
         print('Finished Training')
         writer.flush()
 
-        resnet18_parameters_path = ham10000_autoconfig.get_resnet18_parameters_path()
+        resnet18_parameters_path = src.exp4.ham10000_autoconfig.get_resnet18_parameters_path()
         timestamp = time.strftime("%Y%m%d%H%M%S")
         trained_model_filename = resnet18_parameters_path + timestamp + '_ham10000_trained_model.pth'
         torch.save(self.model.state_dict(), trained_model_filename)
 
     def display_batch(self, images_batch, writer):
         grid_img = torchvision.utils.make_grid(images_batch, nrow=10, normalize=True, scale_each=True)
-        '''
-        how to unnormalize images:
-        from https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821/20
-
-        mean = torch.tensor([0.4915, 0.4823, 0.4468])
-        std = torch.tensor([0.2470, 0.2435, 0.2616])
-
-        normalize = transforms.Normalize(mean.tolist(), std.tolist())
-        unnormalize = transforms.Normalize((-mean / std).tolist(), (1.0 / std).tolist())
-        unnormalized_grid_image = unnormalize(grid_img)
-
-        plt.imshow(unnormalized_grid_image.permute(1, 2, 0))
-        self.matplotlib_imshow(unnormalized_grid_image)
-        writer.add_image('Current image batch (unnormalized)',
-                         unnormalized_grid_image)
-        '''
         self.matplotlib_imshow(grid_img)
         writer.add_image('Current image batch (normalized)', grid_img)
 
