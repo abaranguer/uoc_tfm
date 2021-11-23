@@ -1,13 +1,13 @@
-from sklearn.metrics import average_precision_score
 import numpy as np
+from sklearn.metrics import average_precision_score
 
 y_labels = np.array([0, 0, 1, 1, 1, 2, 2])
 
 y_scores = np.array([
-    [0.1, 0.4, 0.35, 0.8, 0.2, 0.3, 0.6], # prediccion de clasificador 1
+    [0.1, 0.4, 0.35, 0.8, 0.2, 0.3, 0.6],  # prediccion de clasificador 1
     [0.2, 0.3, 0.4, 0.1, 0.5, 0.2, 0.3],  # prediccion de clasificador 2
-    [0.7, 0.3, 0.25, 0.1, 0.3, 0.5, 0.1], # prediccion de clasificador 3
-    ])
+    [0.7, 0.3, 0.25, 0.1, 0.3, 0.5, 0.1],  # prediccion de clasificador 3
+])
 
 # la suma de las columnas y_scores da 1
 
@@ -29,7 +29,7 @@ ws = sum(freqs) / freqs
 ws = ws / sum(ws)
 
 for fr, w, cls_id in zip(freqs, ws, range(3)):
-    print(f"clase {cls_id} ocupa {fr*100:.4}% en la base de datos --> su peso: {w:.4}")
+    print(f"clase {cls_id} ocupa {fr * 100:.4}% en la base de datos --> su peso: {w:.4}")
 
 mAP = ws @ mAPs
 print(f"mAP ponderada: {mAP}")

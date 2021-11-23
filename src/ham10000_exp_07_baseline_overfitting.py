@@ -28,9 +28,9 @@ if __name__ == '__main__':
     images_path = base.ham10000_autoconfig.get_images_path()
     print('1 . Splits training, validation and test sets')
     N = 10015.
-    Nbt = 10. # training batch size
-    Nbv = 10. # validation batch size
-    Nbp = 0. # predictions (test) batch
+    Nbt = 10.  # training batch size
+    Nbv = 10.  # validation batch size
+    Nbp = 0.  # predictions (test) batch
     percent_train = (Nbt * 100.) / N
     percent_val = (Nbv * 100.) / N
     percent_test = 1. - (percent_train + percent_val)

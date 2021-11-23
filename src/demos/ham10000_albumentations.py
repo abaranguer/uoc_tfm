@@ -39,18 +39,18 @@ albumentation_transforms = A.Compose([
 
     # Affine Transforms
     A.OneOf([
-    #     A.Affine(),
-    #     A.PiecewiseAffine(),
-         A.ElasticTransform(),
-    #     A.ShiftScaleRotate(),
+        #     A.Affine(),
+        #     A.PiecewiseAffine(),
+        A.ElasticTransform(),
+        #     A.ShiftScaleRotate(),
         A.Compose([
             A.Rotate(),
             A.Resize(height=225, width=300)
-        ]) ,
-    #     A.SafeRotate(),
-    #     A.RandomRotate90(),
-    #     A.RandomScale(),
-    #     A.NoOp()
+        ]),
+        #     A.SafeRotate(),
+        #     A.RandomRotate90(),
+        #     A.RandomScale(),
+        #     A.NoOp()
     ], p=0.5),
 
     # # Flips

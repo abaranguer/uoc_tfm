@@ -17,9 +17,9 @@ ham10000_os_config = {
     'dataframe_path_win': 'C:/albert/UOC/dataframes/',
     'dataframe_path_clb': '/content/drive/MyDrive/UOC-TFM/dataframes/',
 
-    'tensorboard_logs_path_lnx' : '/home/albert/UOC-TFM/tensorboard-logs',
-    'tensorboard_logs_path_win' : 'C:/albert/UOC/tensorboard-logs',
-    'tensorboard_logs_path_clb' : '/content/drive/MyDrive/UOC-TFM/tensorboard-logs'
+    'tensorboard_logs_path_lnx': '/home/albert/UOC-TFM/tensorboard-logs',
+    'tensorboard_logs_path_win': 'C:/albert/UOC/tensorboard-logs',
+    'tensorboard_logs_path_clb': '/content/drive/MyDrive/UOC-TFM/tensorboard-logs'
 }
 
 
@@ -71,6 +71,7 @@ def get_resnet18_parameters_path():
 def get_dataframe_path():
     key = 'dataframe_path' + get_os_suffix()
     return ham10000_os_config[key]
+
 
 def get_tensorboard_logs_path():
     key = 'tensorboard_logs_path' + get_os_suffix()

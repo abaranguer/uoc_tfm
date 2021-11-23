@@ -3,13 +3,14 @@
 
 import time
 
-import torch
-import torch.optim
-from torch.nn import CrossEntropyLoss
-from torch.optim import SGD
-import torchvision
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
+import torch.optim
+import torchvision
+from torch.nn import CrossEntropyLoss
+from torch.optim import SGD
+
 import ham10000_autoconfig
 
 

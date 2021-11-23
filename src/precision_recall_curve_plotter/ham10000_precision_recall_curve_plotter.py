@@ -75,11 +75,12 @@ class Ham10000PrecisionRecallCurvePlotter:
         plt.show()
 '''
 
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import PrecisionRecallDisplay
-import numpy as np
-import matplotlib.pyplot as plt
 import random
+
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.metrics import PrecisionRecallDisplay
+from sklearn.metrics import precision_recall_curve
 
 random.seed(42)
 ground_truth = []
@@ -136,6 +137,3 @@ for i in range(50):
 
     recall = tp / (tp + fn )
 '''
-
-
-

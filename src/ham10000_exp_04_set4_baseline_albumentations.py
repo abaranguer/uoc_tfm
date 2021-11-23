@@ -28,7 +28,7 @@ if __name__ == '__main__':
     print('1 . Splits training, validation and test sets')
     metadata_path = base.ham10000_autoconfig.get_metadata_path()
     images_path = base.ham10000_autoconfig.get_images_path()
-    splitter = Ham10000DatasetWeightedSplitter(metadata_path, images_path, percent_val=0.15, percent_test=0.15)
+    splitter = Ham10000DatasetWeightedSplitter(metadata_path, images_path, set_number=4, percent_val=0.15, percent_test=0.15)
     train_dataloader = splitter.train_dataloader
     validation_dataloader = splitter.validation_dataloader
     test_dataloader = splitter.test_dataloader

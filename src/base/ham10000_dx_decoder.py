@@ -13,13 +13,13 @@ dx_to_int = {
 }
 
 int_to_dx = [
-     'akiec',
-     'bcc',
-     'bkl',
-     'df',
-     'nv',
-     'mel',
-     'vasc'
+    'akiec',
+    'bcc',
+    'bkl',
+    'df',
+    'nv',
+    'mel',
+    'vasc'
 ]
 
 dx_to_description = {

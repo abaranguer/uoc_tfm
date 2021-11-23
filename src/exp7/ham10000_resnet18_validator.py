@@ -62,13 +62,13 @@ class Ham10000ResNet18Validator:
 
         self.class_names = ['', '', '', '', '', '', '']
 
-        self.all_predicted_scores = [] # ndarray of shape (n_samples,) or (n_samples, n_classes)
-        self.all_predicted_labels = [] # akiec, bcc, bkl, df, mel, nv, vasc
-        self.all_predicted_labels_indexes = [] # 0..6
+        self.all_predicted_scores = []  # ndarray of shape (n_samples,) or (n_samples, n_classes)
+        self.all_predicted_labels = []  # akiec, bcc, bkl, df, mel, nv, vasc
+        self.all_predicted_labels_indexes = []  # 0..6
 
-        self.all_ground_truth_scores = [] # ndarray of shape (n_samples,) or (n_samples, n_classes)
-        self.all_ground_truth_labels = [] # akiec, bcc, bkl, df, mel, nv, vasc
-        self.all_ground_truth_indexes = [] # 0..6
+        self.all_ground_truth_scores = []  # ndarray of shape (n_samples,) or (n_samples, n_classes)
+        self.all_ground_truth_labels = []  # akiec, bcc, bkl, df, mel, nv, vasc
+        self.all_ground_truth_indexes = []  # 0..6
 
         self.all_predicted_scores_akiec = []
         self.all_ground_truth_akiec = []
@@ -174,15 +174,14 @@ class Ham10000ResNet18Validator:
                                                                 self.all_predicted_scores_vasc)
 
         self.mAP_micro = sklearn.metrics.average_precision_score(self.all_ground_truth_scores,
-                                                           self.all_predicted_scores,
-                                                           average='micro')
+                                                                 self.all_predicted_scores,
+                                                                 average='micro')
         self.mAP_macro = sklearn.metrics.average_precision_score(self.all_ground_truth_scores,
                                                                  self.all_predicted_scores,
                                                                  average='macro')
         self.mAP_weighted = sklearn.metrics.average_precision_score(self.all_ground_truth_scores,
                                                                     self.all_predicted_scores,
                                                                     average='weighted')
-
 
     def calculate_handmade_metrics(self, predicted_label, labels):
         np_predicted = predicted_label.numpy()

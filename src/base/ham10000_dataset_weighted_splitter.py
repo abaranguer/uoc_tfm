@@ -1,19 +1,19 @@
 # https://discuss.pytorch.org/t/how-does-weightedrandomsampler-work/8089
 # https://towardsdatascience.com/pytorch-basics-sampling-samplers-2a0f29f0bf2a
 
+import albumentations as A
 import numpy as np
 import pandas
+from albumentations.pytorch import ToTensorV2
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from torch.utils.data import WeightedRandomSampler
 from torchvision import transforms
 
+from ham10000_albumentation_dataset_loader import Ham10000AlbumentationDataset
 from ham10000_analyzer import Ham10000DatasetAnalyzer
 from ham10000_dataset_loader import Ham10000Dataset
-from ham10000_albumentation_dataset_loader import Ham10000AlbumentationDataset
 
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
 
 class Ham10000DatasetWeightedSplitter:
 
@@ -124,12 +124,12 @@ class Ham10000DatasetWeightedSplitter:
             ], p=0.5),
 
             # Normalize
-            A.Normalize(mean=[0.764, 0.547, 0.571], # mean of RGB channels of HAM10000 dataset
-                        std=[0.141, 0.152, 0.169], # std. dev. of RGB channels of HAM10000 dataset
+            A.Normalize(mean=[0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
+                        std=[0.141, 0.152, 0.169],  # std. dev. of RGB channels of HAM10000 dataset
                         p=1),
 
             ToTensorV2()
-            ],
+        ],
 
             p=1
         )
@@ -150,7 +150,8 @@ class Ham10000DatasetWeightedSplitter:
                 [0.141, 0.152, 0.169])  # std. dev. of RGB channels of HAM10000 dataset
         ])
 
-        self.train_dataset = Ham10000AlbumentationDataset(self.train_set, dataset_images_path, self.albumentation_transforms)
+        self.train_dataset = Ham10000AlbumentationDataset(self.train_set, dataset_images_path,
+                                                          self.albumentation_transforms)
         # self.train_dataset = Ham10000Dataset(self.train_set, dataset_images_path, self.data_transform)
         self.validation_dataset = Ham10000Dataset(self.validation_set, dataset_images_path, self.data_transform)
         self.test_dataset = Ham10000Dataset(self.test_set, dataset_images_path, self.data_transform)

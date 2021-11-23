@@ -30,8 +30,8 @@ class Ham10000ResNet18Predictor:
             outputs = self.model(images_as_tensors)
             _, predicted = torch.max(outputs, 1)
 
-        title_pred =   '   Predicted: ' + ' '.join('%5s' % int_to_dx[int(predicted[j])] for j in range(len(predicted)))
-        #ground_truth = 'Ground Truth: ' + ' '.join('%5s' % int_to_dx[int(predicted[j])] for j in range(len(predicted)))
+        title_pred = '   Predicted: ' + ' '.join('%5s' % int_to_dx[int(predicted[j])] for j in range(len(predicted)))
+        # ground_truth = 'Ground Truth: ' + ' '.join('%5s' % int_to_dx[int(predicted[j])] for j in range(len(predicted)))
 
     def display_batch(self, images_batch, writer):
         grid_img = torchvision.utils.make_grid(images_batch, nrow=1, normalize=True, scale_each=True)

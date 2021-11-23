@@ -7,8 +7,8 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-from ham10000_analyzer import Ham10000DatasetAnalyzer
-from ham10000_dataset_loader import Ham10000Dataset
+from src.exp2.ham10000_analyzer import Ham10000DatasetAnalyzer
+from src.exp2.ham10000_dataset_loader import Ham10000Dataset
 
 
 class Ham10000DatasetSplitter:

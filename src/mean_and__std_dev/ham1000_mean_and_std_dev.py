@@ -3,9 +3,10 @@ import time
 from os import listdir
 from os.path import isfile, join
 
+from PIL import Image
+
 import ham10000_autoconfig
 
-from PIL import Image
 
 class Ham10000MeanAndStdDevCalculator:
     def __init__(self):
@@ -26,7 +27,7 @@ class Ham10000MeanAndStdDevCalculator:
         print(self.path_base)
 
         self.imagefiles = [imagefile for imagefile in listdir(self.path_base) if
-                      isfile(join(self.path_base, imagefile))]
+                           isfile(join(self.path_base, imagefile))]
 
         print('Start!')
         self.mean_calculator()
@@ -151,6 +152,7 @@ class Ham10000MeanAndStdDevCalculator:
         print(f'normalized std. dev. B: {self.norm_std_dev_b: .3f}')
 
         self.log_time('end std. dev. calculation time')
+
 
 if __name__ == "__main__":
     calculator = Ham10000MeanAndStdDevCalculator()

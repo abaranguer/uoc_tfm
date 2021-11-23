@@ -8,8 +8,8 @@ import torchvision.models as models
 
 import base.ham10000_autoconfig
 from exp8.ham10000_dataset_splitter import Ham10000DatasetSplitter
-from exp8.ham10000_resnet18_validator import Ham10000ResNet18Validator
 from exp8.ham10000_resnet18_predictor import Ham10000ResNet18Predictor
+from exp8.ham10000_resnet18_validator import Ham10000ResNet18Validator
 
 
 def log_time(message):
@@ -30,11 +30,11 @@ if __name__ == '__main__':
     print('2 - Load ResNet18 model')
     model = models.resnet18()
     resnet18_parameters_path = base.ham10000_autoconfig.get_resnet18_parameters_path()
-    #resnet18_parameters_filename = '20211110212929_ham10000_trained_model.pth'
+    # resnet18_parameters_filename = '20211110212929_ham10000_trained_model.pth'
     # resnet18_parameters_filename = '20211102005954_ham10000_trained_model.pth' # (weighted)
     # resnet18_parameters_filename = '20211030161151_ham10000_trained_model.pth' # (baseline - no weighted)
     # resnet18_parameters_filename = '20211108145111_ham10000_trained_model.pth'
-    resnet18_parameters_filename = '20211110212929_ham10000_trained_model.pth' # albumentation-1
+    resnet18_parameters_filename = '20211110212929_ham10000_trained_model.pth'  # albumentation-1
 
     resnet18_parameters = resnet18_parameters_path + resnet18_parameters_filename
     model.load_state_dict(torch.load(resnet18_parameters))
