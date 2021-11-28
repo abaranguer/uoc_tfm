@@ -7,8 +7,8 @@ dx_to_int = {
     'bcc': 1,
     'bkl': 2,
     'df': 3,
-    'nv': 4,
-    'mel': 5,
+    'mel': 4,
+    'nv': 5,
     'vasc': 6
 }
 
@@ -17,8 +17,8 @@ int_to_dx = [
     'bcc',
     'bkl',
     'df',
-    'nv',
     'mel',
+    'nv',
     'vasc'
 ]
 

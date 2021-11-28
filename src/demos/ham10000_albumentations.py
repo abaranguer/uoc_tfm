@@ -75,8 +75,9 @@ albumentation_transforms = A.Compose([
 
     # Normalize
     A.Normalize(mean=[0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
-                std=[0.141, 0.152, 0.169],  # std. dev. of RGB channels of HAM10000 dataset
-                p=1),
+                 std=[0.141, 0.152, 0.169],  # std. dev. of RGB channels of HAM10000 dataset
+                 p=1),
+    # A.Normalize(p=1),
 
     ToTensorV2()
 ], p=1)
