@@ -11,9 +11,9 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-import src.exp4.ham10000_autoconfig
-from src.exp4.ham10000_dataset_loader import Ham10000Dataset
-from src.exp4.ham10000_dx_decoder import int_to_dx
+import src.exp5.ham10000_autoconfig
+from src.exp5.ham10000_dataset_loader import Ham10000Dataset
+from src.exp5.ham10000_dx_decoder import int_to_dx
 
 
 class Ham10000ResNet18Predictor:

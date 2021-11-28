@@ -11,10 +11,10 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
-import src.exp4.ham10000_autoconfig
-from src.exp4.ham10000_dataset_loader import Ham10000Dataset
-from src.exp4.ham10000_dx_decoder import dx_to_description
-from src.exp4.ham10000_dx_decoder import dx_to_int
+import src.exp5.ham10000_autoconfig
+from src.exp5.ham10000_dataset_loader import Ham10000Dataset
+from src.exp5.ham10000_dx_decoder import dx_to_description
+from src.exp5.ham10000_dx_decoder import dx_to_int
 
 ''' 
 Albumentations:  

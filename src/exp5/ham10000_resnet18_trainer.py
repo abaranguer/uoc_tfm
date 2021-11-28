@@ -11,7 +11,7 @@ import torchvision
 from torch.nn import CrossEntropyLoss
 from torch.optim import SGD
 
-import src.exp4.ham10000_autoconfig
+import src.exp5.ham10000_autoconfig
 
 
 class Ham10000ResNet18Trainer:
