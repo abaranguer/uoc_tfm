@@ -29,7 +29,7 @@ torch.manual_seed(42)
 img_path = 'C:/albert/UOC/dataset/dataset ham_10000/ham10000/300x225/ISIC_0024306.jpg'
 image_pil_1 = PIL.Image.open(img_path).convert('RGB')
 
-augmented = torchvision_transforms = T.Compose([
+augmented = T.Compose([
     T.TenCrop(size=[180,240]),
     T.Lambda(lambda crops: torch.stack([T.ToTensor()(crop) for crop in crops])),
     T.Lambda(lambda crops: torch.stack([T.Resize(size=[225,300])(crop) for crop in crops])),

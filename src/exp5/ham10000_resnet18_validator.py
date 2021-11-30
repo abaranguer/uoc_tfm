@@ -4,6 +4,7 @@
 import matplotlib.pyplot as plt
 import sklearn.metrics
 import torch.optim
+import torchvision.transforms as T
 
 
 class Ham1000NaiveMetrics:
@@ -99,6 +100,15 @@ class Ham10000ResNet18Validator:
 
         self.handmade_metrics = Ham1000NaiveMetrics()
 
+        self.augmented = T.Compose([
+            T.TenCrop(size=[180, 240]),
+            T.Lambda(lambda crops: torch.stack([T.ToTensor()(crop) for crop in crops])),
+            T.Lambda(lambda crops: torch.stack([T.Resize(size=[225, 300])(crop) for crop in crops])),
+            T.Normalize(
+                [0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
+                [0.141, 0.152, 0.169])  # std. dev. of RGB channels of HAM10000 dataset
+        ])
+
         self.model.eval()
 
     def run_validation(self):
@@ -107,19 +117,30 @@ class Ham10000ResNet18Validator:
         self.handmade_metrics.class_names = self.class_names
 
         for i, images in enumerate(self.validation_dataloader, 0):
+            if i % 10 == 0:
+                print(f'validation iteration {i}')
             inputs = images['image']
             labels = images['label']
 
             with torch.no_grad():
                 outputs = self.model(inputs)
+
+                j = 0
+                for image in inputs:
+                    pil_image = T.ToPILImage()(image.squeeze_(0))
+                    augmented_images = self.augmented(pil_image)
+                    outputs_tta = self.model(augmented_images)
+                    outputs[j].data = torch.mean(outputs_tta.data, 0)
+                    j += 1
+
                 _, predicted_label = torch.max(outputs.data, 1)
-                self.precalculate_metrics(outputs, predicted_label, labels)
+                self.precalculate_metrics(outputs, labels)
                 self.calculate_handmade_metrics(predicted_label, labels)
 
         self.show_mAP()
         self.show_metrics()
 
-    def precalculate_metrics(self, outputs, predicted_label, labels):
+    def precalculate_metrics(self, outputs, labels):
         predicted = outputs.data[:, :7]
 
         ix_akiec = self.class_names.index('akiec')

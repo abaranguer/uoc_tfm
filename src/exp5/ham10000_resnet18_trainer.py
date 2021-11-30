@@ -113,7 +113,7 @@ class Ham10000ResNet18Trainer:
         print('Finished Training')
         writer.flush()
 
-        resnet18_parameters_path = src.exp4.ham10000_autoconfig.get_resnet18_parameters_path()
+        resnet18_parameters_path = src.exp5.ham10000_autoconfig.get_resnet18_parameters_path()
         timestamp = time.strftime("%Y%m%d%H%M%S")
         trained_model_filename = resnet18_parameters_path + timestamp + '_ham10000_trained_model.pth'
         torch.save(self.model.state_dict(), trained_model_filename)

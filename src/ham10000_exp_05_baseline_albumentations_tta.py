@@ -28,7 +28,7 @@ if __name__ == '__main__':
     print('1 . Splits training, validation and test sets')
     metadata_path = base.ham10000_autoconfig.get_metadata_path()
     images_path = base.ham10000_autoconfig.get_images_path()
-    splitter = Ham10000DatasetWeightedSplitter(metadata_path, images_path, percent_val=0.15, percent_test=0.15)
+    splitter = Ham10000DatasetWeightedSplitter(metadata_path, images_path, set_number=5, percent_val=0.15, percent_test=0.15)
     train_dataloader = splitter.train_dataloader
     validation_dataloader = splitter.validation_dataloader
     test_dataloader = splitter.test_dataloader
@@ -37,10 +37,10 @@ if __name__ == '__main__':
     model = models.resnet18()
 
     print('3 - train model')
-    trainer = Ham10000ResNet18Trainer(train_dataloader, model, epochs=5)
+    trainer = Ham10000ResNet18Trainer(train_dataloader, model, epochs=1)
 
     log_time('\tTraining start time:')
-    tensorboard_logs = ham10000_autoconfig.get_tensorboard_logs_path()
+    tensorboard_logs = base.ham10000_autoconfig.get_tensorboard_logs_path()
     writer = SummaryWriter(log_dir=tensorboard_logs)
     trainer.run_training(writer)
     log_time('\tTraining end time:')
