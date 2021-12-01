@@ -14,7 +14,7 @@ from src.exp1.ham10000_dataset_loader import Ham10000Dataset
 class Ham10000DatasetSplitter:
     def __init__(self, dataset_metadata_path, dataset_images_path,
                  percent_val=0.15, percent_test=0.15,
-                 BATCH_SIZE=100, VAL_BATCH_SIZE=20, TEST_BATCH_SIZE=20):
+                 BATCH_SIZE=100, VAL_BATCH_SIZE=100, TEST_BATCH_SIZE=100):
         np.random.seed(0)
         self.analyzer = Ham10000DatasetAnalyzer()
         self.analyzer.analyze_path(dataset_metadata_path)

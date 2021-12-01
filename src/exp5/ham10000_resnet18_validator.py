@@ -130,7 +130,9 @@ class Ham10000ResNet18Validator:
                     pil_image = T.ToPILImage()(image.squeeze_(0))
                     augmented_images = self.augmented(pil_image)
                     outputs_tta = self.model(augmented_images)
-                    outputs[j].data = torch.mean(outputs_tta.data, 0)
+                    outputs_tta_plus_original = torch.vstack([outputs_tta,
+                                                              outputs[j]])
+                    outputs[j] = torch.mean(outputs_tta_plus_original, 0)
                     j += 1
 
                 _, predicted_label = torch.max(outputs.data, 1)

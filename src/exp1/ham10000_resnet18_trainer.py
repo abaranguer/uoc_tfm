@@ -12,6 +12,7 @@ from torch.nn import CrossEntropyLoss
 from torch.optim import SGD
 
 import src.exp1.ham10000_autoconfig
+from src.exp1.ham10000_resnet18_validator import Ham10000ResNet18Validator
 
 
 class Ham10000ResNet18Trainer:
@@ -67,7 +68,8 @@ class Ham10000ResNet18Trainer:
         print(f'\t   nv: {self.num_nv}  ({100.0 * self.num_nv / self.num_total:.2f} %)')
         print(f'\t vasc: {self.num_vasc}  ({100.0 * self.num_vasc / self.num_total:.2f} %)')
 
-    def run_training(self, writer):
+
+    def run_training_and_validation(self, writer, validation_dataloader):
         self.loss = CrossEntropyLoss()
         self.optimizer = SGD(self.model.parameters(), lr=0.001, momentum=0.9)
 
@@ -76,9 +78,20 @@ class Ham10000ResNet18Trainer:
         print(f'using {self.which_device} device')
         device = torch.device(self.which_device)
 
-        num_steps = 1
-        running_loss = 0.0
         num_images = 0.0
+        sum_loss = 0.0
+
+        print('4 - model validation previous to model training (epoch 0)')
+        graph_name = 'training - average loss vs. epoch'
+        epoch0_training_average_loss_graphicator = Ham10000ResNet18Validator(self.model,
+                                                                             self.train_dataloader)
+        epoch0_training_average_loss_graphicator.run_epoch_validation(self.loss,
+                                                                      writer,
+                                                                      0,
+                                                                      graph_name=graph_name)
+
+        validator = Ham10000ResNet18Validator(self.model, validation_dataloader)
+        validator.run_epoch_validation(self.loss, writer, 0)
 
         for epoch in range(self.epochs):  # loop over the dataset multiple times
             for i, images_batch in enumerate(self.train_dataloader, 0):
@@ -100,18 +113,36 @@ class Ham10000ResNet18Trainer:
                 self.optimizer.step()
 
                 loss_current_value = loss_current.item()
-                running_loss += loss_current_value
-                running_loss_per_train_images = running_loss / num_images
+                sum_loss += loss_current_value
+                # running_loss += loss_current_value
+                # running_loss_per_train_images = running_loss / num_images
 
-                writer.add_scalar("loss/steps", loss_current_value, num_steps)
-                writer.add_scalar("running_loss/num_images", running_loss_per_train_images, num_images)
+                writer.add_scalar("training - loss vs. num of training images",
+                                  loss_current_value,
+                                  num_images)
 
-                num_steps += 1
-                print(f'epoch: {epoch}; i : {i} ')
+                # writer.add_scalar("training - running_loss/num_images",
+                #                   running_loss_per_train_images,
+                #                   num_images)
+
+                print(f'epoch: {epoch + 1}; i : {i + 1} ')
+
+            average_loss = sum_loss / num_images
+            writer.add_scalar(graph_name,
+                              average_loss,
+                              epoch + 1)
+
+            print(f'4 - model validation after epoch {epoch + 1}')
+            validator = Ham10000ResNet18Validator(self.model, validation_dataloader)
+            validator.run_epoch_validation(self.loss, writer, epoch + 1)
 
         self.show_counters()
         print('Finished Training')
         writer.flush()
+
+        print(f'4 - model validation. Calculate metrics')
+        validator = Ham10000ResNet18Validator(self.model, validation_dataloader)
+        validator.run_validation()
 
         resnet18_parameters_path = src.exp1.ham10000_autoconfig.get_resnet18_parameters_path()
         timestamp = time.strftime("%Y%m%d%H%M%S")
@@ -120,22 +151,6 @@ class Ham10000ResNet18Trainer:
 
     def display_batch(self, images_batch, writer):
         grid_img = torchvision.utils.make_grid(images_batch, nrow=10, normalize=True, scale_each=True)
-        '''
-        how to unnormalize images:
-        from https://discuss.pytorch.org/t/simple-way-to-inverse-transform-normalization/4821/20
-
-        mean = torch.tensor([0.4915, 0.4823, 0.4468])
-        std = torch.tensor([0.2470, 0.2435, 0.2616])
-
-        normalize = transforms.Normalize(mean.tolist(), std.tolist())
-        unnormalize = transforms.Normalize((-mean / std).tolist(), (1.0 / std).tolist())
-        unnormalized_grid_image = unnormalize(grid_img)
-
-        plt.imshow(unnormalized_grid_image.permute(1, 2, 0))
-        self.matplotlib_imshow(unnormalized_grid_image)
-        writer.add_image('Current image batch (unnormalized)',
-                         unnormalized_grid_image)
-        '''
         self.matplotlib_imshow(grid_img)
         writer.add_image('Current image batch (normalized)', grid_img)
 

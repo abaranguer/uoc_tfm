@@ -10,7 +10,6 @@ from torch.utils.tensorboard import SummaryWriter
 
 import base.ham10000_autoconfig
 from exp1.ham10000_dataset_splitter import Ham10000DatasetSplitter
-from exp1.ham10000_resnet18_predictor import Ham10000ResNet18Predictor
 from exp1.ham10000_resnet18_trainer import Ham10000ResNet18Trainer
 from exp1.ham10000_resnet18_validator import Ham10000ResNet18Validator
 
@@ -27,7 +26,10 @@ if __name__ == '__main__':
     metadata_path = base.ham10000_autoconfig.get_metadata_path()
     images_path = base.ham10000_autoconfig.get_images_path()
     print('1 . Splits training, validation and test sets')
-    splitter = Ham10000DatasetSplitter(metadata_path, images_path, percent_val=0.15, percent_test=0.15)
+    splitter = Ham10000DatasetSplitter(metadata_path,
+                                       images_path,
+                                       percent_val=0.15,
+                                       percent_test=0.15)
     train_dataloader = splitter.train_dataloader
     validation_dataloader = splitter.validation_dataloader
     test_dataloader = splitter.test_dataloader
@@ -41,17 +43,12 @@ if __name__ == '__main__':
     log_time('\tTraining start time:')
     tensorboard_logs_path = base.ham10000_autoconfig.get_tensorboard_logs_path()
     writer = SummaryWriter(log_dir=tensorboard_logs_path)
-    trainer.run_training(writer)
-
+    trainer.run_training_and_validation(writer, validation_dataloader)
     log_time('\tTraining end time:')
 
-    print('4 - validate model')
-    validator = Ham10000ResNet18Validator(model, validation_dataloader)
-    validator.run_validation()
-
     print('5 - make predictions')
-    predictor = Ham10000ResNet18Predictor(model, test_dataloader)
-    predictor.run_predictor()
+    validator = Ham10000ResNet18Validator(model, test_dataloader)
+    validator.run_validation()
 
     writer.close()
 

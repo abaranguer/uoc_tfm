@@ -37,7 +37,7 @@ if __name__ == '__main__':
     model = models.resnet18()
 
     print('3 - train model')
-    trainer = Ham10000ResNet18Trainer(train_dataloader, model, epochs=1)
+    trainer = Ham10000ResNet18Trainer(train_dataloader, model, epochs=5)
 
     log_time('\tTraining start time:')
     tensorboard_logs = base.ham10000_autoconfig.get_tensorboard_logs_path()
