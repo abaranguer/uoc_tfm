@@ -132,7 +132,7 @@ class Ham10000ResNet18Validator:
                     outputs_tta = self.model(augmented_images)
                     outputs_tta_plus_original = torch.vstack([outputs_tta,
                                                               outputs[j]])
-                    outputs[j] = torch.mean(outputs_tta_plus_original, 0)
+                    outputs[j].data = torch.mean(outputs_tta_plus_original.data, 0)
                     j += 1
 
                 _, predicted_label = torch.max(outputs.data, 1)
