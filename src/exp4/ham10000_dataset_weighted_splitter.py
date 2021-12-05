@@ -64,12 +64,21 @@ class Ham10000DatasetWeightedSplitter:
         ])
         '''
 
-        self.data_transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(
-                [0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
-                [0.141, 0.152, 0.169])  # std. dev. of RGB channels of HAM10000 dataset
-        ])
+        if set_number == 6:
+            self.data_transform = transforms.Compose([
+                transforms.CenterCrop(size=(225, 225)),
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    [0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
+                    [0.141, 0.152, 0.169])  # std. dev. of RGB channels of HAM10000 dataset
+            ])
+        else:
+            self.data_transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize(
+                    [0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
+                    [0.141, 0.152, 0.169])  # std. dev. of RGB channels of HAM10000 dataset
+            ])
 
         self.train_dataset = Ham10000AlbumentationDataset(self.train_set, dataset_images_path,
                                                           self.albumentation_transforms)

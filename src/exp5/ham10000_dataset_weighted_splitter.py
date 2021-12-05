@@ -65,6 +65,7 @@ class Ham10000DatasetWeightedSplitter:
         '''
 
         self.data_transform = transforms.Compose([
+            transforms.CenterCrop(size=(225, 225)),
             transforms.ToTensor(),
             transforms.Normalize(
                 [0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset

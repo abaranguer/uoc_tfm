@@ -10,9 +10,9 @@ from torch.utils.data import DataLoader
 from torch.utils.data import WeightedRandomSampler
 from torchvision import transforms
 
-from ham10000_albumentation_dataset_loader import Ham10000AlbumentationDataset
-from ham10000_analyzer import Ham10000DatasetAnalyzer
-from ham10000_dataset_loader import Ham10000Dataset
+from src.exp8.ham10000_albumentation_dataset_loader import Ham10000AlbumentationDataset
+from src.exp8.ham10000_analyzer import Ham10000DatasetAnalyzer
+from src.exp8.ham10000_dataset_loader import Ham10000Dataset
 
 
 class Ham10000DatasetWeightedSplitter:

@@ -5,7 +5,7 @@ import time
 
 import pandas
 
-import ham10000_autoconfig
+import src.exp8.ham10000_autoconfig
 
 
 class Ham10000DatasetAnalyzer:
@@ -49,7 +49,7 @@ class Ham10000DatasetAnalyzer:
         # self.save_dataframe(title)
 
     def save_dataframe(self, title):
-        dataframe_path = ham10000_autoconfig.get_dataframe_path()
+        dataframe_path = src.exp8.ham10000_autoconfig.get_dataframe_path()
 
         timestamp = time.strftime("%Y%m%d%H%M%S")
         filename = dataframe_path + timestamp + '_' + title + ".csv"
@@ -72,7 +72,7 @@ class Ham10000DatasetAnalyzer:
 
 if __name__ == '__main__':
     analyzer = Ham10000DatasetAnalyzer()
-    analyzer.analyze_path(ham10000_autoconfig.get_metadata_path())
+    analyzer.analyze_path(src.exp8.ham10000_autoconfig.get_metadata_path())
     num_of_images, dataset_classes, dataset_classes_counts = analyzer.metadata()
 
     print(f'num of images: {num_of_images}')

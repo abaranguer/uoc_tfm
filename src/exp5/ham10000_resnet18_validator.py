@@ -101,9 +101,10 @@ class Ham10000ResNet18Validator:
         self.handmade_metrics = Ham1000NaiveMetrics()
 
         self.augmented = T.Compose([
-            T.TenCrop(size=[180, 240]),
+            T.CenterCrop(size=(225, 225)),
+            T.TenCrop(size=[180, 180]),
             T.Lambda(lambda crops: torch.stack([T.ToTensor()(crop) for crop in crops])),
-            T.Lambda(lambda crops: torch.stack([T.Resize(size=[225, 300])(crop) for crop in crops])),
+            T.Lambda(lambda crops: torch.stack([T.Resize(size=[225, 225])(crop) for crop in crops])),
             T.Normalize(
                 [0.764, 0.547, 0.571],  # mean of RGB channels of HAM10000 dataset
                 [0.141, 0.152, 0.169])  # std. dev. of RGB channels of HAM10000 dataset
