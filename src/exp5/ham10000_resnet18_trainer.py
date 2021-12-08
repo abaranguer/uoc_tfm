@@ -12,16 +12,14 @@ from torch.nn import CrossEntropyLoss
 from torch.optim import SGD
 
 import src.exp5.ham10000_autoconfig
+from src.exp5.ham10000_resnet18_validator import Ham10000ResNet18Validator
 
 
 class Ham10000ResNet18Trainer:
 
-    def __init__(self, train_dataloader, model, epochs=5):
+    def __init__(self, train_dataloader, epochs=5):
         self.train_dataloader = train_dataloader
-        self.model = model
         self.epochs = epochs
-        self.loss = None
-        self.optimizer = None
         self.which_device = ""
         self.num_akiec = 0
         self.num_bcc = 0
@@ -31,8 +29,6 @@ class Ham10000ResNet18Trainer:
         self.num_nv = 0
         self.num_vasc = 0
         self.num_total = 0
-
-        self.model.train()
 
     def update_counters(self, dx):
         for current_dx in dx:
@@ -67,9 +63,10 @@ class Ham10000ResNet18Trainer:
         print(f'\t   nv: {self.num_nv}  ({100.0 * self.num_nv / self.num_total:.2f} %)')
         print(f'\t vasc: {self.num_vasc}  ({100.0 * self.num_vasc / self.num_total:.2f} %)')
 
-    def run_training(self, writer):
-        self.loss = CrossEntropyLoss()
-        self.optimizer = SGD(self.model.parameters(), lr=0.001, momentum=0.9)
+    def run_training(self, model, writer):
+        model.train()
+        loss = CrossEntropyLoss()
+        optimizer = SGD(model.parameters(), lr=0.001, momentum=0.9)
 
         # select device (GPU or CPU)
         self.which_device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -92,12 +89,12 @@ class Ham10000ResNet18Trainer:
                 num_images += batch_size
                 self.display_batch(inputs, writer)
 
-                self.optimizer.zero_grad()
+                optimizer.zero_grad()
 
-                outputs = self.model(inputs)
-                loss_current = self.loss(outputs, labels)
+                outputs = model(inputs)
+                loss_current = loss(outputs, labels)
                 loss_current.backward()
-                self.optimizer.step()
+                optimizer.step()
 
                 loss_current_value = loss_current.item()
                 running_loss += loss_current_value
@@ -115,8 +112,98 @@ class Ham10000ResNet18Trainer:
 
         resnet18_parameters_path = src.exp5.ham10000_autoconfig.get_resnet18_parameters_path()
         timestamp = time.strftime("%Y%m%d%H%M%S")
+        model.eval()
         trained_model_filename = resnet18_parameters_path + timestamp + '_ham10000_trained_model.pth'
-        torch.save(self.model.state_dict(), trained_model_filename)
+        torch.save(model.state_dict(), trained_model_filename)
+
+    def run_training_and_validation(self, model, writer, validation_dataloader):
+        loss = CrossEntropyLoss()
+        optimizer = SGD(model.parameters(), lr=0.001, momentum=0.9)
+
+        # select device (GPU or CPU)
+        self.which_device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        print(f'using {self.which_device} device')
+        device = torch.device(self.which_device)
+
+        num_images = 0.0
+        sum_loss = 0.0
+
+        print('- model validation previous to model training (epoch 0)')
+        graph_name = 'training - average loss vs. epoch'
+        epoch0_training_average_loss_graphicator = Ham10000ResNet18Validator(
+            self.train_dataloader
+        )
+        model.eval()
+        epoch0_training_average_loss_graphicator.run_epoch_validation(
+            model,
+            loss,
+            writer,
+            0,
+            graph_name=graph_name
+        )
+
+        validator = Ham10000ResNet18Validator(validation_dataloader)
+        model.eval()
+        validator.run_epoch_validation(model, loss, writer, 0)
+
+        for epoch in range(self.epochs):  # loop over the dataset multiple times
+            model.train()
+            for i, images_batch in enumerate(self.train_dataloader, 0):
+                inputs = images_batch['image']
+                labels = images_batch['label']
+                dx = images_batch['dx']
+
+                self.update_counters(dx)
+
+                batch_size = inputs.size(0)
+                num_images += batch_size
+                self.display_batch(inputs, writer)
+
+                optimizer.zero_grad()
+
+                outputs = model(inputs)
+                loss_current = loss(outputs, labels)
+                loss_current.backward()
+                optimizer.step()
+
+                loss_current_value = loss_current.item()
+                sum_loss += loss_current_value
+                # running_loss += loss_current_value
+                # running_loss_per_train_images = running_loss / num_images
+
+                writer.add_scalar("training - loss vs. num of training images",
+                                  loss_current_value,
+                                  num_images)
+
+                # writer.add_scalar("training - running_loss/num_images",
+                #                   running_loss_per_train_images,
+                #                   num_images)
+
+                print(f'epoch: {epoch + 1}; i : {i + 1} ')
+
+            average_loss = sum_loss / num_images
+            writer.add_scalar(graph_name,
+                              average_loss,
+                              epoch + 1)
+
+            print(f'- model validation after epoch {epoch + 1}')
+            validator = Ham10000ResNet18Validator(validation_dataloader)
+            model.eval()
+            validator.run_epoch_validation(model, loss, writer, epoch + 1)
+
+        self.show_counters()
+        print('Finished Training')
+        writer.flush()
+
+        print(f'- model validation. Calculate metrics')
+        validator = Ham10000ResNet18Validator(validation_dataloader)
+        model.eval()
+        validator.run_validation(model)
+
+        resnet18_parameters_path = src.exp5.ham10000_autoconfig.get_resnet18_parameters_path()
+        timestamp = time.strftime("%Y%m%d%H%M%S")
+        trained_model_filename = resnet18_parameters_path + timestamp + '_ham10000_trained_model.pth'
+        torch.save(model.state_dict(), trained_model_filename)
 
     def display_batch(self, images_batch, writer):
         grid_img = torchvision.utils.make_grid(images_batch, nrow=10, normalize=True, scale_each=True)

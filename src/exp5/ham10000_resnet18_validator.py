@@ -9,17 +9,6 @@ import torchvision.transforms as T
 
 class Ham1000NaiveMetrics:
     def __init__(self):
-        '''
-        akiec: 327
-        bcc: 514
-        bkl: 1099
-        df: 115
-        nv: 6705
-        mel: 1113
-        vasc: 142
-
-        total: 10015
-        '''
         self.manual_confusion_matrix = [[0, 0, 0, 0, 0, 0, 0],
                                         [0, 0, 0, 0, 0, 0, 0],
                                         [0, 0, 0, 0, 0, 0, 0],
@@ -57,8 +46,7 @@ class Ham1000NaiveMetrics:
 
 
 class Ham10000ResNet18Validator:
-    def __init__(self, model, validation_dataloader):
-        self.model = model
+    def __init__(self, validation_dataloader):
         self.validation_dataloader = validation_dataloader
 
         self.class_names = ['', '', '', '', '', '', '']
@@ -110,9 +98,55 @@ class Ham10000ResNet18Validator:
                 [0.141, 0.152, 0.169])  # std. dev. of RGB channels of HAM10000 dataset
         ])
 
-        self.model.eval()
+    def run_epoch_validation(self, model, loss, writer, epoch, graph_name='validation - average loss vs. epoch'):
+        # self.populate_class_names()
+        # self.handmade_metrics.class_names = self.class_names
 
-    def run_validation(self):
+        sum_loss = 0.0
+        num_images = 0.0
+
+        for i, images in enumerate(self.validation_dataloader, 0):
+            inputs = images['image']
+            labels = images['label']
+            batch_size = inputs.size(0)
+            num_images += batch_size
+
+            with torch.no_grad():
+                outputs = model(inputs)
+                loss_current = loss(outputs, labels)
+
+                loss_current_value = loss_current.item()
+                sum_loss += loss_current_value
+                # running_loss_per_train_images = running_loss / num_images
+
+        average_loss = sum_loss / num_images
+        writer.add_scalar(graph_name,
+                          average_loss,
+                          epoch)
+
+        # writer.add_scalar("validation - running_loss/num_images",
+        #                   running_loss_per_train_images,
+        #                   epoch)
+
+    def run_validation(self, model):
+        self.populate_class_names()
+
+        self.handmade_metrics.class_names = self.class_names
+
+        for i, images in enumerate(self.validation_dataloader, 0):
+            inputs = images['image']
+            labels = images['label']
+
+            with torch.no_grad():
+                outputs = model(inputs)
+                _, predicted_label = torch.max(outputs.data, 1)
+                self.precalculate_metrics(outputs, labels)
+                self.calculate_handmade_metrics(predicted_label, labels)
+
+        self.show_mAP()
+        self.show_metrics()
+
+    def run_tta_validation(self, model):
         self.populate_class_names()
 
         self.handmade_metrics.class_names = self.class_names
@@ -124,13 +158,13 @@ class Ham10000ResNet18Validator:
             labels = images['label']
 
             with torch.no_grad():
-                outputs = self.model(inputs)
+                outputs = model(inputs)
 
                 j = 0
                 for image in inputs:
                     pil_image = T.ToPILImage()(image.squeeze_(0))
                     augmented_images = self.augmented(pil_image)
-                    outputs_tta = self.model(augmented_images)
+                    outputs_tta = model(augmented_images)
                     outputs_tta_plus_original = torch.vstack([outputs_tta,
                                                               outputs[j]])
                     outputs[j].data = torch.mean(outputs_tta_plus_original.data, 0)
