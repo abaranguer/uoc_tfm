@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
     log_time('\tTraining start time:')
     for current_batch in range(NUM_BATCHES):
-        trained_model_filename = resnet18_parameters_path + timestamp + f'_ham10000_trained_epoch_{current_batch}.pth'
+        trained_model_filename = resnet18_parameters_path + timestamp + f'_ham10000_trained_epoch_batch_{current_batch}.pth'
 
         if (current_batch > 0):
             previous_batch = current_batch - 1
