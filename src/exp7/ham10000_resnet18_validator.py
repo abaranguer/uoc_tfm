@@ -6,6 +6,7 @@ import sklearn.metrics
 import torch.optim
 
 
+
 class Ham1000NaiveMetrics:
     def __init__(self):
         self.manual_confusion_matrix = [[0, 0, 0, 0, 0, 0, 0],
@@ -43,10 +44,15 @@ class Ham1000NaiveMetrics:
                                      for element in self.manual_confusion_matrix[row]])
             print(f'{self.class_names[row]:>5}\t\t{formatted_row}')
 
+    def get_global_accuracy(self):
+        if self.total == 0:
+            return 0.0
+        else:
+            return self.correct / self.total
+
 
 class Ham10000ResNet18Validator:
-    def __init__(self, model, validation_dataloader):
-        self.model = model
+    def __init__(self, validation_dataloader):
         self.validation_dataloader = validation_dataloader
 
         self.class_names = ['', '', '', '', '', '', '']
@@ -88,10 +94,22 @@ class Ham10000ResNet18Validator:
 
         self.handmade_metrics = Ham1000NaiveMetrics()
 
-    def run_epoch_validation(self, loss, writer, epoch, graph_name ='validation - average loss vs. epoch'):
-        self.model.eval()
-        # self.populate_class_names()
-        # self.handmade_metrics.class_names = self.class_names
+    def run_epoch_validation(
+            self,
+            model,
+            loss,
+            writer,
+            epoch,
+            is_train_set=False):
+
+        if is_train_set:
+            graph_name_loss ='Training - Average Loss vs. Epoch'
+            graph_name_accuracy='Training - Accuracy vs. Epoch'
+        else:
+            graph_name_loss ='Validation - Average Loss vs. Epoch'
+            graph_name_accuracy='Validation - Accuracy vs. Epoch'
+
+        model.eval()
 
         sum_loss = 0.0
         num_images = 0.0
@@ -103,27 +121,38 @@ class Ham10000ResNet18Validator:
             num_images += batch_size
 
             with torch.no_grad():
-                outputs = self.model(inputs)
+                outputs = model(inputs)
                 loss_current = loss(outputs, labels)
 
                 loss_current_value = loss_current.item()
                 sum_loss += loss_current_value
-                # running_loss_per_train_images = running_loss / num_images
 
         average_loss = sum_loss / num_images
-        writer.add_scalar(graph_name,
+        writer.add_scalar(graph_name_loss,
                           average_loss,
                           epoch)
 
-        # writer.add_scalar("validation - running_loss/num_images",
-        #                   running_loss_per_train_images,
-        #                   epoch)
+        global_accuracy = self.calculate_global_accuracy(model)
+        writer.add_scalar(graph_name_accuracy,
+                          global_accuracy,
+                          epoch)
 
-        self.model.train()
+    def calculate_global_accuracy(self, model):
+        self.populate_class_names()
+        self.handmade_metrics.class_names = self.class_names
+        for i, images in enumerate(self.validation_dataloader, 0):
+            inputs = images['image']
+            labels = images['label']
 
+            with torch.no_grad():
+                outputs = model(inputs)
+                _, predicted_label = torch.max(outputs.data, 1)
+                self.precalculate_metrics(outputs, labels)
+                self.calculate_handmade_metrics(predicted_label, labels)
 
+        return self.handmade_metrics.get_global_accuracy()
 
-    def run_validation(self):
+    def run_validation(self, model):
         self.populate_class_names()
 
         self.handmade_metrics.class_names = self.class_names
@@ -133,7 +162,7 @@ class Ham10000ResNet18Validator:
             labels = images['label']
 
             with torch.no_grad():
-                outputs = self.model(inputs)
+                outputs = model(inputs)
                 _, predicted_label = torch.max(outputs.data, 1)
                 self.precalculate_metrics(outputs, labels)
                 self.calculate_handmade_metrics(predicted_label, labels)
@@ -211,14 +240,17 @@ class Ham10000ResNet18Validator:
         num_elements = len(np_predicted)
 
         for i in range(num_elements):
-            predicted_class = self.class_names[np_predicted[i]]
-            ground_truth_class = self.class_names[np_label[i]]
-            self.all_predicted_labels.append(predicted_class)
-            self.all_predicted_labels_indexes.append(np_predicted[i])
-            self.all_ground_truth_labels.append(ground_truth_class)
-            self.all_ground_truth_indexes.append(np_label[i])
+            try:
+                predicted_class = self.class_names[np_predicted[i]]
+                ground_truth_class = self.class_names[np_label[i]]
+                self.all_predicted_labels.append(predicted_class)
+                self.all_predicted_labels_indexes.append(np_predicted[i])
+                self.all_ground_truth_labels.append(ground_truth_class)
+                self.all_ground_truth_indexes.append(np_label[i])
 
-            self.handmade_metrics.update(predicted_class, ground_truth_class)
+                self.handmade_metrics.update(predicted_class, ground_truth_class)
+            except:
+                pass
 
     def show_mAP(self):
         self.calculate_mAP_per_class()

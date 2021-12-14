@@ -30,29 +30,33 @@ class torch.nn.Module[source]
 class Ham10000Resnet18ModelWithDropout2d(nn.Module):
     def __init__(self):
         super(Ham10000Resnet18ModelWithDropout2d, self).__init__()
-        self.drop = nn.Dropout2d(0.05)
+        self.drop_relu = nn.Dropout2d(0.05)
+        self.drop_layer3 = nn.Dropout2d(0.05)
+        self.drop_layer4 = nn.Dropout2d(0.05)
         self.backbone = models.resnet18()
 
     def forward(self, x):
-        x = self.backbone.conv1(x)
         '''
         https://pytorch.org/docs/stable/generated/torch.nn.Dropout2d.html
         "Usually the input comes from nn.Conv2d modules."
-        
-        https://www.machinecurve.com/index.php/2021/07/07/using-dropout-with-pytorch/
-        The Dropout technique can be used for avoiding overfitting in your neural network. 
-        '''
-        x = self.drop(x)
 
+        https://www.machinecurve.com/index.php/2021/07/07/using-dropout-with-pytorch/
+        The Dropout technique can be used for avoiding overfitting in your neural network.
+        '''
+        x = self.backbone.conv1(x)
         x = self.backbone.bn1(x)
         x = self.backbone.relu(x)
+        x = self.drop_relu (x)
 
         x = self.backbone.maxpool(x)
 
         x = self.backbone.layer1(x)
         x = self.backbone.layer2(x)
+
         x = self.backbone.layer3(x)
+        x = self.drop_layer3(x)
         x = self.backbone.layer4(x)
+        x = self.drop_layer4(x)
 
         x = self.backbone.avgpool(x)
         x = torch.flatten(x, 1)

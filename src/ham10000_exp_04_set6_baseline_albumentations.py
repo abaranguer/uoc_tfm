@@ -10,7 +10,6 @@ from torch.utils.tensorboard import SummaryWriter
 
 import base.ham10000_autoconfig
 from exp4.ham10000_dataset_weighted_splitter import Ham10000DatasetWeightedSplitter
-from exp4.ham10000_resnet18_predictor import Ham10000ResNet18Predictor
 from exp4.ham10000_resnet18_trainer import Ham10000ResNet18Trainer
 from exp4.ham10000_resnet18_validator import Ham10000ResNet18Validator
 
@@ -50,7 +49,7 @@ if __name__ == '__main__':
     validator.run_validation()
 
     print('5 - make predictions')
-    predictor = Ham10000ResNet18Predictor(model, test_dataloader)
+    predictor = Ham10000ResNet18Validator(model, test_dataloader)
     predictor.run_predictor()
 
     writer.close()

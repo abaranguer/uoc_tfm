@@ -8,17 +8,6 @@ import torch.optim
 
 class Ham1000NaiveMetrics:
     def __init__(self):
-        '''
-        akiec: 327
-        bcc: 514
-        bkl: 1099
-        df: 115
-        nv: 6705
-        mel: 1113
-        vasc: 142
-
-        total: 10015
-        '''
         self.manual_confusion_matrix = [[0, 0, 0, 0, 0, 0, 0],
                                         [0, 0, 0, 0, 0, 0, 0],
                                         [0, 0, 0, 0, 0, 0, 0],
@@ -56,8 +45,7 @@ class Ham1000NaiveMetrics:
 
 
 class Ham10000ResNet18Validator:
-    def __init__(self, model, validation_dataloader):
-        self.model = model
+    def __init__(self, validation_dataloader):
         self.validation_dataloader = validation_dataloader
 
         self.class_names = ['', '', '', '', '', '', '']
@@ -99,9 +87,33 @@ class Ham10000ResNet18Validator:
 
         self.handmade_metrics = Ham1000NaiveMetrics()
 
-        self.model.eval()
+    def run_epoch_validation(self, model, loss, writer, epoch, graph_name='validation - average loss vs. epoch'):
+        # self.populate_class_names()
+        # self.handmade_metrics.class_names = self.class_names
 
-    def run_validation(self):
+        sum_loss = 0.0
+        num_images = 0.0
+
+        for i, images in enumerate(self.validation_dataloader, 0):
+            inputs = images['image']
+            labels = images['label']
+            batch_size = inputs.size(0)
+            num_images += batch_size
+
+            with torch.no_grad():
+                outputs = model(inputs)
+                loss_current = loss(outputs, labels)
+
+                loss_current_value = loss_current.item()
+                sum_loss += loss_current_value
+                # running_loss_per_train_images = running_loss / num_images
+
+        average_loss = sum_loss / num_images
+        writer.add_scalar(graph_name,
+                          average_loss,
+                          epoch)
+
+    def run_validation(self, model):
         self.populate_class_names()
 
         self.handmade_metrics.class_names = self.class_names
@@ -111,15 +123,15 @@ class Ham10000ResNet18Validator:
             labels = images['label']
 
             with torch.no_grad():
-                outputs = self.model(inputs)
+                outputs = model(inputs)
                 _, predicted_label = torch.max(outputs.data, 1)
-                self.precalculate_metrics(outputs, predicted_label, labels)
+                self.precalculate_metrics(outputs, labels)
                 self.calculate_handmade_metrics(predicted_label, labels)
 
         self.show_mAP()
         self.show_metrics()
 
-    def precalculate_metrics(self, outputs, predicted_label, labels):
+    def precalculate_metrics(self, outputs, labels):
         predicted = outputs.data[:, :7]
 
         ix_akiec = self.class_names.index('akiec')

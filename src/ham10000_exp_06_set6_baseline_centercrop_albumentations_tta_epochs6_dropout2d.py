@@ -6,11 +6,12 @@ import time
 import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
+from torch.nn import CrossEntropyLoss
+from torch.optim import SGD
 
 import base.ham10000_autoconfig
 from exp6.ham10000_dataset_weighted_splitter import Ham10000DatasetWeightedSplitter
 from exp6.ham10000_resnet18_model_with_dropout import Ham10000Resnet18ModelWithDropout2d
-from exp6.ham10000_resnet18_predictor import Ham10000ResNet18Predictor
 from exp6.ham10000_resnet18_trainer import Ham10000ResNet18Trainer
 from exp6.ham10000_resnet18_validator import Ham10000ResNet18Validator
 
@@ -41,23 +42,28 @@ if __name__ == '__main__':
 
     print('2 - create ResNet18 model')
     model = Ham10000Resnet18ModelWithDropout2d()
+    loss = CrossEntropyLoss()
+    optimizer = SGD(model.parameters(), lr=0.001, momentum=0.9)
 
     print('3 - train model')
-    trainer = Ham10000ResNet18Trainer(train_dataloader, model, epochs=6)
+    trainer = Ham10000ResNet18Trainer(train_dataloader, validation_dataloader, epochs=6)
 
     log_time('\tTraining start time:')
     tensorboard_logs = base.ham10000_autoconfig.get_tensorboard_logs_path()
     writer = SummaryWriter(log_dir=tensorboard_logs)
-    trainer.run_training(writer)
+    model.train()
+    trainer.run_training(model, loss, optimizer, writer)
     log_time('\tTraining end time:')
 
     print('4 - validate model')
-    validator = Ham10000ResNet18Validator(model, validation_dataloader)
-    validator.run_validation()
+    validator = Ham10000ResNet18Validator(validation_dataloader)
+    model.eval()
+    validator.run_validation(model)
 
     print('5 - make predictions')
-    predictor = Ham10000ResNet18Predictor(model, test_dataloader)
-    predictor.run_predictor()
+    predictor = Ham10000ResNet18Validator(test_dataloader)
+    model.eval()
+    predictor.run_predictor(model)
 
     writer.close()
 

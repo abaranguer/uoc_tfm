@@ -8,8 +8,6 @@ import numpy as np
 import torch
 import torch.optim
 import torchvision
-from torch.nn import CrossEntropyLoss
-from torch.optim import SGD
 
 import src.exp7.ham10000_autoconfig
 from src.exp7.ham10000_resnet18_validator import Ham10000ResNet18Validator
@@ -17,12 +15,9 @@ from src.exp7.ham10000_resnet18_validator import Ham10000ResNet18Validator
 
 class Ham10000ResNet18Trainer:
 
-    def __init__(self, train_dataloader, model, epochs=5):
+    def __init__(self, train_dataloader, epochs=5):
         self.train_dataloader = train_dataloader
-        self.model = model
         self.epochs = epochs
-        self.loss = None
-        self.optimizer = None
         self.which_device = ""
         self.num_akiec = 0
         self.num_bcc = 0
@@ -32,8 +27,6 @@ class Ham10000ResNet18Trainer:
         self.num_nv = 0
         self.num_vasc = 0
         self.num_total = 0
-
-        self.model.train()
 
     def update_counters(self, dx):
         for current_dx in dx:
@@ -69,10 +62,7 @@ class Ham10000ResNet18Trainer:
         print(f'\t vasc: {self.num_vasc}  ({100.0 * self.num_vasc / self.num_total:.2f} %)')
 
 
-    def run_training_and_validation(self, writer, validation_dataloader):
-        self.loss = CrossEntropyLoss()
-        self.optimizer = SGD(self.model.parameters(), lr=0.001, momentum=0.9)
-
+    def run_training_and_validation(self, model, loss, optimizer, writer, validation_dataloader):
         # select device (GPU or CPU)
         self.which_device = "cuda:0" if torch.cuda.is_available() else "cpu"
         print(f'using {self.which_device} device')
@@ -82,18 +72,22 @@ class Ham10000ResNet18Trainer:
         sum_loss = 0.0
 
         print('4 - model validation previous to model training (epoch 0)')
-        graph_name = 'training - average loss vs. epoch'
-        epoch0_training_average_loss_graphicator = Ham10000ResNet18Validator(self.model,
-                                                                             self.train_dataloader)
-        epoch0_training_average_loss_graphicator.run_epoch_validation(self.loss,
-                                                                      writer,
-                                                                      0,
-                                                                      graph_name=graph_name)
 
-        validator = Ham10000ResNet18Validator(self.model, validation_dataloader)
-        validator.run_epoch_validation(self.loss, writer, 0)
+        epoch0_training_average_loss_graphicator = Ham10000ResNet18Validator(self.train_dataloader)
+        model.eval()
+        epoch0_training_average_loss_graphicator.run_epoch_validation(
+            model,
+            loss,
+            writer,
+            0,
+            is_train_set=True)
+
+        validator = Ham10000ResNet18Validator(validation_dataloader)
+        model.eval()
+        validator.run_epoch_validation(model, loss, writer, 0, is_train_set=False)
 
         for epoch in range(self.epochs):  # loop over the dataset multiple times
+            model.train()
             for i, images_batch in enumerate(self.train_dataloader, 0):
                 inputs = images_batch['image']
                 labels = images_batch['label']
@@ -105,49 +99,56 @@ class Ham10000ResNet18Trainer:
                 num_images += batch_size
                 self.display_batch(inputs, writer)
 
-                self.optimizer.zero_grad()
+                optimizer.zero_grad()
 
-                outputs = self.model(inputs)
-                loss_current = self.loss(outputs, labels)
+                outputs = model(inputs)
+                loss_current = loss(outputs, labels)
                 loss_current.backward()
-                self.optimizer.step()
+                optimizer.step()
 
                 loss_current_value = loss_current.item()
                 sum_loss += loss_current_value
-                # running_loss += loss_current_value
-                # running_loss_per_train_images = running_loss / num_images
 
-                writer.add_scalar("training - loss vs. num of training images",
+                writer.add_scalar("Training - Loss vs. Num. of Training Images",
                                   loss_current_value,
                                   num_images)
 
-                # writer.add_scalar("training - running_loss/num_images",
-                #                   running_loss_per_train_images,
-                #                   num_images)
-
                 print(f'epoch: {epoch + 1}; i : {i + 1} ')
 
-            average_loss = sum_loss / num_images
-            writer.add_scalar(graph_name,
-                              average_loss,
-                              epoch + 1)
+
+            # average_loss = sum_loss / num_images
+            # writer.add_scalar('Training - Average Loss vs. Epoch',
+            #                   average_loss,
+            #                   epoch + 1)
+
+            epoch_training_graphicator = Ham10000ResNet18Validator(self.train_dataloader)
+            model.eval()
+            epoch_training_graphicator.run_epoch_validation(
+                model,
+                loss,
+                writer,
+                epoch + 1,
+                is_train_set=True)
+
 
             print(f'4 - model validation after epoch {epoch + 1}')
-            validator = Ham10000ResNet18Validator(self.model, validation_dataloader)
-            validator.run_epoch_validation(self.loss, writer, epoch + 1)
+            validator = Ham10000ResNet18Validator(validation_dataloader)
+            model.eval()
+            validator.run_epoch_validation(model, loss, writer, epoch + 1, is_train_set=False)
 
         self.show_counters()
         print('Finished Training')
         writer.flush()
 
         print(f'4 - model validation. Calculate metrics')
-        validator = Ham10000ResNet18Validator(self.model, validation_dataloader)
-        validator.run_validation()
+        validator = Ham10000ResNet18Validator(validation_dataloader)
+        model.eval()
+        validator.run_validation(model)
 
         resnet18_parameters_path = src.exp7.ham10000_autoconfig.get_resnet18_parameters_path()
         timestamp = time.strftime("%Y%m%d%H%M%S")
         trained_model_filename = resnet18_parameters_path + timestamp + '_ham10000_trained_model.pth'
-        torch.save(self.model.state_dict(), trained_model_filename)
+        torch.save(model.state_dict(), trained_model_filename)
 
     def display_batch(self, images_batch, writer):
         grid_img = torchvision.utils.make_grid(images_batch, nrow=10, normalize=True, scale_each=True)

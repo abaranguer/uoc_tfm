@@ -50,7 +50,7 @@ if __name__ == '__main__':
     validator.run_validation()
 
     print('5 - make predictions')
-    predictor = Ham10000ResNet18Predictor(model, test_dataloader)
+    predictor = Ham10000ResNet18Validator(model, test_dataloader)
     predictor.run_predictor()
 
     writer.close()

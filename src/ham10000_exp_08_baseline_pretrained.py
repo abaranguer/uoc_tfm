@@ -5,10 +5,13 @@ import time
 
 import torch
 import torchvision.models as models
+from torch.nn import CrossEntropyLoss
+from torch.optim import SGD
+from torch.utils.tensorboard import SummaryWriter
 
 import base.ham10000_autoconfig
 from exp8.ham10000_dataset_splitter import Ham10000DatasetSplitter
-from exp8.ham10000_resnet18_predictor import Ham10000ResNet18Predictor
+from exp8.ham10000_resnet18_trainer import Ham10000ResNet18Trainer
 from exp8.ham10000_resnet18_validator import Ham10000ResNet18Validator
 
 
@@ -27,26 +30,43 @@ if __name__ == '__main__':
     validation_dataloader = splitter.validation_dataloader
     test_dataloader = splitter.test_dataloader
 
-    print('2 - Load ResNet18 model')
-    model = models.resnet18()
+    print('2 - train 5 epochs loading and saving epoch training')
     resnet18_parameters_path = base.ham10000_autoconfig.get_resnet18_parameters_path()
-    # resnet18_parameters_filename = '20211110212929_ham10000_trained_model.pth'
-    # resnet18_parameters_filename = '20211102005954_ham10000_trained_model.pth' # (weighted)
-    # resnet18_parameters_filename = '20211030161151_ham10000_trained_model.pth' # (baseline - no weighted)
-    # resnet18_parameters_filename = '20211108145111_ham10000_trained_model.pth'
-    resnet18_parameters_filename = '20211204214312_ham10000_trained_model.pth'  # albumentation-1
+    timestamp = time.strftime("%Y%m%d")
+    running_loss = 0.0
+    for epoch in range(20):
+        model = models.resnet18()
+        loss = CrossEntropyLoss()
+        optimizer = SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-    resnet18_parameters = resnet18_parameters_path + resnet18_parameters_filename
-    model.load_state_dict(torch.load(resnet18_parameters))
+        trained_model_filename = resnet18_parameters_path + timestamp + f'_ham10000_trained_epoch_{epoch}.pth'
+        if epoch > 0:
+            previous_epoch = epoch - 1
+            previous_trained_model_filename = resnet18_parameters_path + timestamp + f'_ham10000_trained_epoch_{previous_epoch}.pth'
+            model.load_state_dict(torch.load(previous_trained_model_filename))
 
-    log_time('\tValidation start time:')
-    print('3 - validate model')
-    validator = Ham10000ResNet18Validator(model, validation_dataloader)
-    validator.run_validation()
-    log_time('\tValidation end time:')
+        print(f'3 - train 1 epoch (epoch {epoch})')
+        trainer = Ham10000ResNet18Trainer(train_dataloader, epochs=1)
+        log_time('\tTraining start time:')
+        tensorboard_logs = base.ham10000_autoconfig.get_tensorboard_logs_path()
+        writer = SummaryWriter(log_dir=tensorboard_logs)
+        model.train()
+        running_loss = trainer.run_training_by_epoch(
+            model,
+            loss,
+            optimizer,
+            writer,
+            epoch,
+            trained_model_filename,
+            running_loss)
+        log_time('\tTraining end time:')
 
-    print('5 - make predictions')
-    predictor = Ham10000ResNet18Predictor(model, test_dataloader)
-    predictor.run_predictor()
+        log_time('\tValidation start time:')
+        print('3 - validate model')
+        validator = Ham10000ResNet18Validator(validation_dataloader)
+        model.eval()
+        validator.run_epoch_validation(model, loss, writer, epoch)
+        log_time('\tValidation end time:')
 
+    writer.flush()
     log_time('Done!')

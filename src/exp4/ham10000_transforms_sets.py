@@ -344,7 +344,7 @@ def get_set6():
             # A.SafeRotate(),
             A.RandomRotate90(), # new!
             # A.RandomScale(),
-            # A.NoOp()
+            A.NoOp()
         ], p=0.5),
 
         # # Flips
