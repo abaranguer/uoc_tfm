@@ -58,7 +58,7 @@ class Ham10000ResNet18TrainerExp02(Ham10000ResNet18Trainer):
 
     def show_counters(self):
         print(f'total num of images: {self.num_total}')
-        print('Number o samples per class:')
+        print('Number of samples per class:')
         print(f'\takiec: {self.num_akiec}  ({100.0 * self.num_akiec / self.num_total:.2f} %)')
         print(f'\t  bcc: {self.num_bcc}  ({100.0 * self.num_bcc / self.num_total:.2f} %)')
         print(f'\t  bkl: {self.num_bkl}  ({100.0 * self.num_bkl / self.num_total:.2f} %)')

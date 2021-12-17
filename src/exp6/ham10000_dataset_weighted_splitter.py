@@ -18,7 +18,7 @@ class Ham10000DatasetWeightedSplitter:
 
     def __init__(self, dataset_metadata_path, dataset_images_path, set_number,
                  percent_val=0.15, percent_test=0.15,
-                 BATCH_SIZE=100, VAL_BATCH_SIZE=20, TEST_BATCH_SIZE=20):
+                 BATCH_SIZE=200, VAL_BATCH_SIZE=200, TEST_BATCH_SIZE=200):
         np.random.seed(0)
         self.analyzer = Ham10000DatasetAnalyzer()
         self.analyzer.analyze_path(dataset_metadata_path)

@@ -41,65 +41,51 @@ if __name__ == '__main__':
     test_dataloader = splitter.test_dataloader
 
     print('3 - train model')
-    NUM_BATCHES = 30
-    NUM_EPOCHS_PER_BATCH = 1
+    NUM_BATCHES = 15
+    NUM_EPOCHS_PER_BATCH = 2
     resnet18_parameters_path = base.ham10000_autoconfig.get_resnet18_parameters_path()
 
     log_time('\tTraining start time:')
     tensorboard_logs = base.ham10000_autoconfig.get_tensorboard_logs_path()
     writer = SummaryWriter(log_dir=tensorboard_logs)
 
-    running_loss = 1082.6754465699196
-    num_images = 154220
+    running_loss_ini = 0.0    # set value!
+    num_images_ini = 0.0
     model = Ham10000Resnet18ModelWithDropout2d()
     loss = CrossEntropyLoss()
     optimizer = SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-    '''
-    epoch0_training_average_loss_graphicator = Ham10000ResNet18Validator(train_dataloader)
-    model.eval()
-    epoch0_training_average_loss_graphicator.run_epoch_validation(
+    log_time('\tTraining start time:')
+    current_batch = 3
+    prefix = 'experiment_dropout_30_epochs'
+    trained_model_filename = resnet18_parameters_path + prefix + f'_ham10000_trained_epoch_batch_{current_batch}.pth'
+
+    if (current_batch > 0):
+        previous_batch = current_batch - 1
+        previous_trained_model_filename = resnet18_parameters_path + prefix + f'_ham10000_trained_epoch_batch_{previous_batch}.pth'
+        model.load_state_dict(torch.load(previous_trained_model_filename))
+
+    print(f'3 - train {NUM_EPOCHS_PER_BATCH} epochs (batch {current_batch})')
+    trainer = Ham10000ResNet18Trainer(train_dataloader, validation_dataloader, epochs=NUM_EPOCHS_PER_BATCH)
+
+    tensorboard_logs = base.ham10000_autoconfig.get_tensorboard_logs_path()
+    writer = SummaryWriter(log_dir=tensorboard_logs)
+    print(f'current batch: {current_batch}')
+    model.train()
+    running_loss, num_images = trainer.run_training_and_validation_by_batch(
         model,
         loss,
+        optimizer,
         writer,
-        0,
-        is_train_set=True)
+        current_batch,
+        NUM_EPOCHS_PER_BATCH,
+        trained_model_filename,
+        running_loss_ini,
+        num_images_ini
+    )
 
-    validator = Ham10000ResNet18Validator(validation_dataloader)
-    model.eval()
-    validator.run_epoch_validation(model, loss, writer, 0, is_train_set=False)
-    '''
-
-    log_time('\tTraining start time:')
-    prefix = 'experiment_dropout_30_epochs'
-    for current_batch in range(22, NUM_BATCHES):    # current_batch inicial  = 22
-        trained_model_filename = resnet18_parameters_path + prefix + f'_ham10000_trained_epoch_batch_{current_batch}.pth'
-
-        if (current_batch > 0):
-            previous_batch = current_batch - 1
-            previous_trained_model_filename = resnet18_parameters_path + prefix + f'_ham10000_trained_epoch_batch_{previous_batch}.pth'
-            del model
-            model = Ham10000Resnet18ModelWithDropout2d()
-            model.load_state_dict(torch.load(previous_trained_model_filename))
-
-        print(f'3 - train {NUM_EPOCHS_PER_BATCH} epochs (batch {current_batch})')
-        trainer = Ham10000ResNet18Trainer(train_dataloader, validation_dataloader, epochs=NUM_EPOCHS_PER_BATCH)
-
-        tensorboard_logs = base.ham10000_autoconfig.get_tensorboard_logs_path()
-        writer = SummaryWriter(log_dir=tensorboard_logs)
-        print(f'current batch: {current_batch}')
-        model.train()
-        running_loss, num_images = trainer.run_training_and_validation_by_batch(
-            model,
-            loss,
-            optimizer,
-            writer,
-            current_batch,
-            NUM_EPOCHS_PER_BATCH,
-            trained_model_filename,
-            running_loss,
-            num_images
-        )
+    running_loss_ini += running_loss
+    num_images_ini += num_images
 
     log_time('\tTraining end time:')
 

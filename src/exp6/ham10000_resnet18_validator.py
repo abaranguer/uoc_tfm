@@ -169,7 +169,7 @@ class Ham10000ResNet18Validator:
         self.handmade_metrics.class_names = self.class_names
 
         for i, images in enumerate(self.validation_dataloader, 0):
-            if i % 10 == 0:
+            if i % 3 == 0:
                 print(f'validation iteration {i}')
             inputs = images['image']
             labels = images['label']
