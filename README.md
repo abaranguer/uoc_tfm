@@ -7,17 +7,17 @@ M1.217 - TFM-Intel·ligència Artificial
 **Professor ponent**: Longlong Yu\
 **Professor Responsable de l'Assignatura**: Carles Ventura Royo
 
-##Paraules clau
+## Paraules clau
 “Medical Images”, “Unbalanced dataset”,  “Data augmentation”
 
-##Resum del Treball
+## Resum del Treball
 "Hi han diverses tècniques que es poden aplicar per al diagnòstic del càncer de pell. A més  de les tècniques de cirurgia menor com la biòpsia, es poden aplicar tècniques de diagnòstic per la imatge.
 El diagnòstic per la imatge és, essencialment, un problema de classificació d’imatges. És un problema escaient, doncs, per a ser resolt amb tècniques de Machine Learning /Deep Leaarning (ML/DL). La temàtica del Treball Final de Màster (TFM) és  la classificació d’imatges aplicada al diagnòstic de lesions de la pell, com poden ser els càncers de pell.  
 Més que aconseguir uns resultats òptims en la classificació, l’objectiu principal ha estat desenvolupar una comprensió general de conceptes i tècniques bàsiques de  ML/DL aplicada a la classificació d’imatges mèdiques. I també el coneixement i aplicació de tècniques bàsiques de ML/DL per a la millora de les característiques (principalment mAP i F1-Score) de la xarxa classificadora.
 Tenint en compte les restriccions de temps i recursos disponible, per a la classificació s’ha utilitzat una xarxa neuronal petita de tipus ResNet18 que ha estat entrenada amb el dataset HAM10000 mitjançant tècniques d’Aprenentatge Automàtic Supervisat, utilitzant scripts desenvolupats amb Python i el framework PyTorch, sobre diferents entorns de treball. S’ha seguit una metodologia iterativa i incremental. 
 Aquesta memòria recull els resultats obtinguts, així com breus introduccions als  diferents aspectes teòrics i pràctics que s’han tractat."
 
-##Millores
+## Millores
 Com l'objectiu del TFM ha estat l'estudi de les tècniques mñ´´es que no l'obtenció d'un producte, el que he obingut han estat molts scripts de proves.
 
 El que caldria ara és reorganitzar-los.
@@ -34,7 +34,7 @@ Per a poder executar localment els experiments i els scripts cal:
 3. Crear la carpeta de logs de Tensorboard (imprescindible per a poder generar les gràfiques).
 4. ajustar la configuració de l'experiment que es vulgui executar per a que tingui en compte les carpetes de dataset i de tensorboard.
 
-###Dataset Ham10000
+### Dataset Ham10000
 Per a que funcionin els scripts cal una estructura de directoris determinada en la que emmagatzemar el dataset i les variants redimensionades que calguin.
 Aquesta estructura és parametritzable als scripts ham10000_autoconfig.py de cada experiment (_TODO_: fer un script de configuració únic per a tots els experiments).
 
@@ -57,7 +57,7 @@ Al final només he fet servir les imatges de 300x225 però, priori, no sabia qui
 
 ![Carpetes amb el dataset redimensionat](./resized-folders.png)
 
-###Com executar els scripts
+### Com executar els scripts
 Per una qüestió pràctica gairebé sempre els he executat des del PyCharm, però no ha d'haver cap problema en executar-los des d'una línia de comandes
 
 No cal fer més que:
@@ -84,7 +84,7 @@ Descripció dels scripts i carpetes dels experiments i carpetes utilitzades
 |/precision_recall_curve_plotter |aquí volia fer un script de càlcul - dibuix de la corba de precision recall, com abase per a calcular la mAP |
 |/resizer | l'script de redimensionat d'imatges|
 
-###Correspondència entre els experiments descrits a la memòria i els scripts al github
+### Correspondència entre els experiments descrits a la memòria i els scripts al github
 |Experiment TFM|Script|
 |---|---|
 |Experiment 1 del TFM | ham10000_exp_01_baseline.py|
