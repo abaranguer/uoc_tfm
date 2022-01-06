@@ -1,99 +1,112 @@
-# uoc_tfm
-Treball Final de Màster (TFM).
-d’Albert Baranguer i Codina
-Màster Universitari d’Enginyeria Informàtica
-Curs 2021-22 – 1
+# Entrenament d’una xarxa neuronal per al diagnòstic de lesions de la pell amb el dataset HAM10000
 
-Títol del TFM
-«Entrenament d’una xarxa neuronal amb el dataset HAM10000 per al diagnòstic de
-lesions de la pell».
+**Albert Baranguer i Codina**\
+Màster Universitari en Enginyeria Informàtica
+M1.217 - TFM-Intel·ligència Artificial
 
-Paraules clau
-Keras, PyTorch, Aprenentatge automàtic (Machine Learning), Aprenentatge profund
-(Deep Learning), Xarxa Neuronal (Neural Network), Convolutional Neural network (CNN),
-Classificació d’imatges (Image classification).
+**Professor ponent**: Longlong Yu\
+**Professor Responsable de l'Assignatura**: Carles Ventura Royo
 
-Temàtica escollida
-La temàtica escollida és la classificació d’imatges (Image Classification) aplicada al
-diagnòstic de lesions de la pell, com càncers de pell.
-Per a la classificació es farà servir una xarxa neuronal que serà entrenada amb el dataset
-HAM10000 mitjançant tècniques d’Aprenentatge Automàtic (Machine Learning, ML) i
-d’Aprenentatge Profund (Deep Learning, DL).
+##Paraules clau
+“Medical Images”, “Unbalanced dataset”,  “Data augmentation”
 
-Problemàtica a resoldre
-Hi han diverses tècniques que es poden aplicar per al diagnòstic del càncer de pell.
-A més de les tècniques de cirurgia menor (biopsia) es poden aplicar tècniques de
-diagnòstic per la imatge.
-Es tracta, doncs, d’un problema de diagnòstic per la imatge, és dir, de classificació
-d’imatges. És un problema escaient per a ser resolt amb tècniques de ML/DL.
+##Resum del Treball
+"Hi han diverses tècniques que es poden aplicar per al diagnòstic del càncer de pell. A més  de les tècniques de cirurgia menor com la biòpsia, es poden aplicar tècniques de diagnòstic per la imatge.
+El diagnòstic per la imatge és, essencialment, un problema de classificació d’imatges. És un problema escaient, doncs, per a ser resolt amb tècniques de Machine Learning /Deep Leaarning (ML/DL). La temàtica del Treball Final de Màster (TFM) és  la classificació d’imatges aplicada al diagnòstic de lesions de la pell, com poden ser els càncers de pell.  
+Més que aconseguir uns resultats òptims en la classificació, l’objectiu principal ha estat desenvolupar una comprensió general de conceptes i tècniques bàsiques de  ML/DL aplicada a la classificació d’imatges mèdiques. I també el coneixement i aplicació de tècniques bàsiques de ML/DL per a la millora de les característiques (principalment mAP i F1-Score) de la xarxa classificadora.
+Tenint en compte les restriccions de temps i recursos disponible, per a la classificació s’ha utilitzat una xarxa neuronal petita de tipus ResNet18 que ha estat entrenada amb el dataset HAM10000 mitjançant tècniques d’Aprenentatge Automàtic Supervisat, utilitzant scripts desenvolupats amb Python i el framework PyTorch, sobre diferents entorns de treball. S’ha seguit una metodologia iterativa i incremental. 
+Aquesta memòria recull els resultats obtinguts, així com breus introduccions als  diferents aspectes teòrics i pràctics que s’han tractat."
 
-Objectius
-El plantejament inicial que faig és:
-• La revisió dels conceptes teòrics necessaris (papers, llibres, cursos...)
-• Proves de concepte amb les llibreries Keras i PyTorch, amb llenguatge Python.
-Sobre Jupyter Notebook (Google Colab) per a major agilitat en les proves.
-• Desenvolupament d’una CNN per a la classificació d’imatges de lesions de la pell.
-• Entrenament de la CNN amb el dataset HAM10000.
-• Iteració i refinament de la CNN mitjançant l’aplicació de tècniques de ML i DL, fins
-aconseguir uns objectius (per determinar) de certs paràmetres (com l’accuracy).
+##Millores
+Com l'objectiu del TFM ha estat l'estudi de les tècniques mñ´´es que no l'obtenció d'un producte, el que he obingut han estat molts scripts de proves.
 
-Què «entra», per tant?
-• el desenvolupament de la CNN,
-• l’entrenament de la CNN
-Per aconseguir-ho caldrà establir uns criteris que permetin quantificar la qualitat del
-classificador. Per assolir aquesta qualitat, o apropar-s’hi tant com sigui possible, caldrà
-aplicar tècniques de ML i DL. És un objectiu del TFM el coneixement i la utilització
-d’aquestes tècniques.
+El que caldria ara és reorganitzar-los.
 
-Què «no entra»?
-El més important és desenvolupar una comprensió general dels conceptes de ML/DL
-aplicada a la classificació d’imatges. I també el coneixement i aplicació de tècniques de
-ML/DL per a la millora de la CNN classificadora.
-No és objectiu prioritari del TFM assolir una determinada precisió del classificador. Tot i
-que, certament, es tractarà d’obtenir els millors resultats.
+- La intenció és refinar el codi: Fer un refactoring seguint els principis del Clean Code de Martin Fowler. Que el codi sigui legible, autoexplicatiu i mantenible. 
+- A més del refactoring seria molt recomanable fer una GUI que permetés llençar els experiments i configurar-ne els paràmetres.
+- També seria molt útil un script instal·lador
+- pendent: els out-of-memory. Es poden evitar? En cas que no es pugui evitar que un entrenament peti, és podria fer que es reprengués automàticament des de l'última epoch acabada correctament.
 
-# Setmana 0. Reunió 1 d’octubre de 2021
-pasos a seguir:
-1) lectura de papers 3-4 -- deadline 8 de Octubre (reunion 16:00-17:00)
-====== decidir en la reunion del dia 8 octubre =========
-2) decidir que backbone (uno sencillito resnet18).
-    hardware google colab
-    timm
-    pipeline de training, torchvision trainin script
-    seguir los pasos de best practices: overfitear un batch durante 100 iteraciones.
-3) definir la funcion de coste
+## Instal·lació
+Per a poder executar localment els experiments i els scripts cal:
+1. Descarregar el codi del GitHub
+2. Instal·lar el dataset i crear-ne les variants redimensionades que calguin 
+3. Crear la carpeta de logs de Tensorboard (imprescindible per a poder generar les gràfiques).
+4. ajustar la configuració de l'experiment que es vulgui executar per a que tingui en compte les carpetes de dataset i de tensorboard.
 
-pagina para buscar papers: http://www.arxiv-sanity.com/
-twit best practices: https://twitter.com/MattNiessner/status/1441027241870118913
+###Dataset Ham10000
+Per a que funcionin els scripts cal una estructura de directoris determinada en la que emmagatzemar el dataset i les variants redimensionades que calguin.
+Aquesta estructura és parametritzable als scripts ham10000_autoconfig.py de cada experiment (_TODO_: fer un script de configuració únic per a tots els experiments).
 
+Per exemple, a la màquina windows que he fet servir he creat la carpeta C:\albert\UOC\dataset\dataset ham_10000\ham10000
 
-# Setmana 1. Reunió 8 d’octubre de 2021
-Implementacion
-* use squeezenet | resnet18 | mobilenet-v3 | efficientnet (light weight backbone)
-* dataset <---
-    * 1000 x 1000
-    * rescalar las imagenes a resolucion (con interpolacion bilinear, mantener el aspect ratio) de
-        1) 64 x 64
-        2) 96 x 96
-        3) 128 x 128
-        4) 192 x 192
-        5) 224 x 224
-* dataloader
-        * [implementar el dataloader sea async con GPU] (https://github.com/rwightman/pytorch-image-models/blob/master/timm/data/loader.py#L57)
-            -- leer datos -- transformar datos -- forward pass -- loss -- backward -- optimizer
-            -- IO               --  cpu              -- GPU  ----- GPU ----- GPU ------ GPU
-* loss [cross entropy]
-* learning scheduler [opcional]
-* optimizer [SGD, Adam, AdamW]
-* implementar la parte de evaluacion
-* --- tensor board (visualizar los losses, accuracies) [optional] ---
+Al final només he fet servir les imatges de 300x225 però, priori, no sabia quines mides acabaria utilitzant; per això, dins d'aquesta carpeta vaig crear les següents subcarpetes, i hi vaig posar les imatges redimensionades corresponents.
 
+| Carpeta | Descripció |
+|---|---|
+| 60x45 | Imatge de Ham10000 redimensionades a 60x45px. Les imatges tenen el mateix nom que les originals del dataset |
+| 120x90 | Imatge de Ham10000 redimensionades a 120x90px. Les imatges tenen el mateix nom que les originals del dataset |
+| 180x135 | Imatge de Ham10000 redimensionades a 180x135px. Les imatges tenen el mateix nom que les originals del dataset |
+| 240x180 | Imatge de Ham10000 redimensionades a 240x180px. Les imatges tenen el mateix nom que les originals del dataset |
+| 300x225 | Imatge de Ham10000 redimensionades a 300x225px. Les imatges tenen el mateix nom que les originals del dataset |
+| 360x270 | Imatge de Ham10000 redimensionades a 360x270px. Les imatges tenen el mateix nom que les originals del dataset |
+| 420x315 | Imatge de Ham10000 redimensionades a 420x315px. Les imatges tenen el mateix nom que les originals del dataset |
+| 480x360 | Imatge de Ham10000 redimensionades a 480x360px. Les imatges tenen el mateix nom que les originals del dataset |
+| 540x405 | Imatge de Ham10000 redimensionades a 540x405px. Les imatges tenen el mateix nom que les originals del dataset |
+| original-image-set_600x450 | Les imatges de Ham10000 amb la mida original |
 
-Preguntas para la siguiente semana:
-* distribucion de categorias
-* cual es la métrica adecuada para evaluar un modelo en datasets de imagenes medicas
-* como dividir el dataset
-* reportar los resultados de experimentos realizados
-* crear un documento csv (google drive) de los resultados (experimentos) interesantes para la comparacion en el futuro.
+![Carpetes amb el dataset redimensionat](./resized-folders.png)
 
+###Com executar els scripts
+Per una qüestió pràctica gairebé sempre els he executat des del PyCharm, però no ha d'haver cap problema en executar-los des d'una línia de comandes
+
+No cal fer més que:
+```
+python nom_de_l'script
+```
+
+Descripció dels scripts i carpetes dels experiments i carpetes utilitzades
+
+| Directori | Descripció |
+|---|---|
+|/base | classes i scripts que fan servir tots els experiments |
+|/demos | calaix de sastre amb scripts variats de proves, codi descarregat... |
+|/exp1 | classses i scripts utilitzats només per l'experiment 1 |
+|/exp2 | classses i scripts utilitzats només per l'experiment 2 |
+|/exp3 | classses i scripts utilitzats només per l'experiment 3 |
+|/exp4 | classses i scripts utilitzats només per l'experiment 4 |
+|/exp5 | classses i scripts utilitzats només per l'experiment 5 |
+|/exp6 | classses i scripts utilitzats només per l'experiment 6 |
+|/exp7 | classses i scripts utilitzats només per l'experiment 7 |
+|/exp8 | classses i scripts utilitzats només per l'experiment 8 |
+|/exp9 | classses i scripts utilitzats només per l'experiment 9 |
+|/mean_and__std_dev | scripts i classe auxiliar per al càlcul de la mitjana i desviació estàsndard dels canals RGB de les imatges de HAM10000 |
+|/precision_recall_curve_plotter |aquí volia fer un script de càlcul - dibuix de la corba de precision recall, com abase per a calcular la mAP |
+|/resizer | l'script de redimensionat d'imatges|
+
+###Correspondència entre els experiments descrits a la memòria i els scripts al github
+|Experiment TFM|Script|
+|---|---|
+|Experiment 1 del TFM | ham10000_exp_01_baseline.py|
+|Experiment 2 del TFM. Overfitting | ham10000_exp_07_baseline_overfitting.py|
+|Experiment 3 del TFM. Congelació de capes | ham10000_exp_09_baseline_layers_1_and_2.py|
+|Experiment 4 del TFM | ham10000_exp_02_baseline_weighted.py|
+|Experiment 5 del TFM | ham10000_exp_03_baseline_weighted_normalized.py|
+|Experiment 6.1 del TFM | ham10000_exp_04_set1_baseline_albumentations.py|
+|Experiment 6.2 del TFM | ham10000_exp_04_set2_baseline_albumentations.py|
+|Experiment 6.3 del TFM | ham10000_exp_04_set3_baseline_albumentations.py|
+|Experiment 6.4 del TFM | ham10000_exp_04_set4_baseline_albumentations.py|
+|Experiment 6.5 del TFM | ham10000_exp_04_set5_baseline_albumentations.py|
+|Experiment 6.6 del TFM | ham10000_exp_04_set6_baseline_albumentations.py|
+|Experiment 7.1 del TFM | ham10000_exp_05_set6_baseline_centercrop_albumentations_tta_epochs5_full.py (amb mateixos pesos que als experiments anteriors)|
+|Experiment 7.2 del TFM | ham10000_exp_05_set6_baseline_centercrop_albumentations_tta_epochs5_full.py (amb pesos modificats)|
+|Experiment 7.3 del TFM | ham10000_exp_05_set6_baseline_centercrop_albumentations_tta_epochs6.py|
+| no el vaig executar | ham10000_exp_05_set6_baseline_centercrop_albumentations_tta_epochs7.py|
+|Experiment 7.4 del TFM | ham10000_exp_05_set6_baseline_centercrop_albumentations_tta_epochs8.py|
+|Experiment 7.5 del TFM | ham10000_exp_05_set6_baseline_centercrop_albumentations_tta_epochs9.py|
+|Entrenament per parts (Experiment 8 del TFM) | ham10000_exp_08_baseline_pretrained.py|
+|Experiment 9 del TFM | ham10000_exp_06_set6_baseline_centercrop_albumentations_tta_epochs30_dropout2d.py|
+|Proves Experiment 9 del TFM | ham10000_exp_06_set6_baseline_centercrop_albumentations_tta_epochs12_dropout2d_pretrained.py|
+|Proves Experiment 9 del TFM | ham10000_exp_06_set6_baseline_centercrop_albumentations_tta_epochs5_dropout2d.py|
+|Proves Experiment 9 del TFM | ham10000_exp_06_set6_baseline_centercrop_albumentations_tta_epochs6_dropout2d.py|
 
